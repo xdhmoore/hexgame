@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+
+git config --global init.defaultBranch mainline
+git config --global --add safe.directory .(:A)
