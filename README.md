@@ -4,7 +4,7 @@ Will eventually be a clone of the game [Hive](https://gen42.com/games/hive). Ver
 
 ### Dev Setup
 
-When you open the root folder in VS Code, it should give you a popup asking if you want to reopen it in a container. Say yes.
+Docker must be running. Then when you open the root folder in VS Code, it should give you a popup asking if you want to reopen it in a container. Say yes.
 
 There is a launch configuration defined for running the game. It doesn't do much currently.
 
