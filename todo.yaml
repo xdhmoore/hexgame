@@ -1,0 +1,27 @@
+---
+
+todos:
+  - code:
+    - [ ] make screencell move when arrow keys are pressed
+      - [ ] alter screencell to map input arrow keys to correct hex-space direction
+  - dev environment:
+    - [ ] integrate black:
+      - [ ] terminal
+      - [ ] vs code - see isort ext page
+    - [ ] integrate pylint:
+      - [ ] terminal
+      - [ ] vs code
+    - [ ] integrate any other vscode plugins, possibly user-specific (not in git):
+      - [ ] editorconfig?
+      - [x] todo tree
+      - [ ] isort?
+      - [ ] intellicode?
+      - [ ] intellicode api usage examples?
+
+someday maybe:
+  - make a kubernetes cluster for everything
+  - integrate with gradle to build
+  - separate out front end from backend using a rest api, maybe using python microservices framework
+  - make a new front end with react (svg? webgl? webgl next?)
+  - play someone else over a network using websockets
+  - make engine for running large numbers of simulations of the game

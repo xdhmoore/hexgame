@@ -17,7 +17,7 @@
     },
    "customizations": {
       "vscode": {
-         "extensions": ["ms-azuretools.vscode-docker", "MermaidChart.vscode-mermaid-chart"]
+         "extensions": ["ms-azuretools.vscode-docker", "MermaidChart.vscode-mermaid-chart", "Gruntfuggly.todo-tree"]
       }
    },
    "containerEnv": {
