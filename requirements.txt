@@ -1,3 +1,4 @@
 # TODO figure out version locking
 blessed
 llist
+pytest

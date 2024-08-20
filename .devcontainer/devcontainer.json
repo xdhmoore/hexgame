@@ -17,7 +17,7 @@
     },
    "customizations": {
       "vscode": {
-         "extensions": ["ms-azuretools.vscode-docker"]
+         "extensions": ["ms-azuretools.vscode-docker", "MermaidChart.vscode-mermaid-chart"]
       }
    },
    "containerEnv": {
@@ -25,3 +25,4 @@
    },
    "postCreateCommand": "chmod ug+x ./.devcontainer/post_create && ./.devcontainer/post_create"
 }
+

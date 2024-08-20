@@ -13,7 +13,7 @@ class Piece:
 
     # Use board.place or move instead
     def _move(self, board: Board, dest: Position) -> None:
-        print(f"{self.pos} -> {dest}")
+        # print(f"{self.pos} -> {dest}")
         if not self.is_move_valid(board, dest): raise ValueError
 
     def is_move_valid(self, board: Board, dest: Position) -> bool:

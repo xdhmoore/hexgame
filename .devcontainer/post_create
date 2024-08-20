@@ -2,3 +2,7 @@
 
 git config --global init.defaultBranch mainline
 git config --global --add safe.directory .(:A)
+
+# Discover all the tests
+pytest --collect-only
+
