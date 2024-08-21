@@ -5,9 +5,14 @@ todos:
     - [ ] make screencell move when arrow keys are pressed
       - [ ] alter screencell to map input arrow keys to correct hex-space direction
   - dev environment:
+    - [ ] something's wack with git status keep sshowing perm changes
+    - [ ] something's wack with git status keep showing file whitespace changes
+    - [ ] fix having to set git username and email every time. this should already be being copied from host when docker container is created. maybe create minimum reproducible example
     - [ ] integrate black:
-      - [ ] terminal
+      - [ ] terminal?
       - [ ] vs code - see isort ext page
+        - [x] added
+        - [ ] test
     - [ ] integrate pylint:
       - [ ] terminal
       - [ ] vs code
