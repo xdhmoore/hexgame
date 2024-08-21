@@ -1,4 +1,3 @@
-
 from hex.board import Board
 from hex.piece import Piece
 from hex.position import Position

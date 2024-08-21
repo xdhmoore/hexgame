@@ -15,7 +15,7 @@ import logging
 import re
 
 # TODO
-'''
+"""
 - place
 - display text
 - move, single player
@@ -23,7 +23,7 @@ import re
 - make cli client
 - make browser client
 
-'''
+"""
 logging.basicConfig(
     filename="./logs/hex.log",
     encoding="utf-8",
@@ -59,7 +59,7 @@ class CliGame:
             piece3 = Piece(None)
             board.move(piece3, Position(0, 0, 1))
             key = None
-            while key != 'q':
+            while key != "q":
                 # TODO - best I can tell, inkey() only returns an obj with
                 # a code or a name if it's a non-alphanumeric key, ie an "application key"
                 # arrow keys are with in this, but I will probably want to use reg keys
@@ -77,5 +77,5 @@ class CliGame:
             # x = input()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     CliGame().main()

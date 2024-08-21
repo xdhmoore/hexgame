@@ -12,10 +12,13 @@ from hex.position import Position
 
 class TestScreenManager:
 
-    @pytest.mark.parametrize('bounds,center', [
-        ((2, 4), (0, 1)),
-        ((3, 5), (1, 2)),
-    ])
+    @pytest.mark.parametrize(
+        "bounds,center",
+        [
+            ((2, 4), (0, 1)),
+            ((3, 5), (1, 2)),
+        ],
+    )
     def test_get_screen_center(self, bounds: tuple, center: tuple):
         term = Mock()
         term.height = bounds[0]

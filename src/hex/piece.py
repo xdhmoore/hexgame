@@ -1,4 +1,3 @@
-
 from typing import List
 from hex.board import Board
 from hex.position import Position
@@ -8,13 +7,14 @@ class Piece:
 
     # TODO use kwargs so that pos is optional instead of requireing
     # None
-    def __init__(self, pos:Position):
+    def __init__(self, pos: Position):
         self.pos = pos
 
     # Use board.place or move instead
     def _move(self, board: Board, dest: Position) -> None:
         # print(f"{self.pos} -> {dest}")
-        if not self.is_move_valid(board, dest): raise ValueError
+        if not self.is_move_valid(board, dest):
+            raise ValueError
 
     def is_move_valid(self, board: Board, dest: Position) -> bool:
         # TODO fix
@@ -23,7 +23,9 @@ class Piece:
         return dest in self.gen_valid_moves(board)
 
     def gen_valid_moves(self, board: Board) -> List[Position]:
-        return list(filter(lambda pos: not board.is_occupied(pos), self.gen_moves(board)))
+        return list(
+            filter(lambda pos: not board.is_occupied(pos), self.gen_moves(board))
+        )
 
     # TODO cache this
     # TODO override for different piece types

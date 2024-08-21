@@ -1,28 +1,33 @@
 // https://containers.dev/implementors/json_reference/
 {
-   "build": {
-      // Path is relative to the devcontainer.json file.
-      "dockerfile": "Dockerfile",
-      "context": ".."
-   },
-    "features": {
-        "ghcr.io/devcontainers/features/common-utils:2":{
-            "installZsh": "true",
-            "configureZshAsDefaultShell": "true",
-            "username": "vscode",
-            "userUid": "1000",
-            "userGid": "1000",
-            "upgradePackages": "true"
-        }
-    },
-   "customizations": {
-      "vscode": {
-         "extensions": ["ms-azuretools.vscode-docker", "MermaidChart.vscode-mermaid-chart", "Gruntfuggly.todo-tree"]
-      }
-   },
-   "containerEnv": {
-      "PYTHONPATH": "${localEnv:PYTHONPATH}:src"
-   },
-   "postCreateCommand": "chmod ug+x ./.devcontainer/post_create && ./.devcontainer/post_create"
+  "build": {
+    // Path is relative to the devcontainer.json file.
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": "true",
+      "configureZshAsDefaultShell": "true",
+      "username": "vscode",
+      "userUid": "1000",
+      "userGid": "1000",
+      "upgradePackages": "true"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "MermaidChart.vscode-mermaid-chart",
+        "Gruntfuggly.todo-tree",
+        "ms-python.isort",
+        "ms-python.black-formatter"
+      ]
+    }
+  },
+  "containerEnv": {
+    "PYTHONPATH": "${localEnv:PYTHONPATH}:src"
+  },
+  "postCreateCommand": "chmod ug+x ./.devcontainer/post_create && ./.devcontainer/post_create"
 }
-

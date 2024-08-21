@@ -1,11 +1,10 @@
-
 from hex.cli.keys import Keys
 from hex.cli.screen_cell import ScreenCell
 from hex.cli.screen_position import ScreenPos
 
 
 class SelectorCell(ScreenCell):
-    def __init__(self, screen_pos: ScreenPos=None):
+    def __init__(self, screen_pos: ScreenPos = None):
         self.screen_pos = screen_pos
         self.bold = True
 
@@ -24,4 +23,3 @@ class SelectorCell(ScreenCell):
                 delta = (0, -1)
             case Keys.RIGHT:
                 delta = (0, 1)
-        

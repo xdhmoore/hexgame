@@ -1,4 +1,3 @@
-
 from functools import reduce
 import logging
 from typing import List
@@ -35,9 +34,11 @@ class ScreenManager:
         self.draw_pieces()
         self.draw_selector()
         self.flush_buffer()
-    
+
     def get_cells_to_draw(self) -> List[ScreenCell]:
-        cells = [ScreenCell(piece) for piece in self.board.pieces.values()] + [self.selector]
+        cells = [ScreenCell(piece) for piece in self.board.pieces.values()] + [
+            self.selector
+        ]
 
     def draw_pieces(self) -> None:
         cells = [ScreenCell(piece) for piece in self.board.pieces.values()]
@@ -54,7 +55,6 @@ class ScreenManager:
 
         for screen_cell in screen_cells:
             screen_cell.draw(self.term, self.display_buff, self.get_viewport_offset())
-
 
     # TODO right now this functions as the viewport but at some point will want to make the viewport moveable
     def get_viewport_offset(self):
@@ -77,20 +77,22 @@ class ScreenManager:
     def clear_display_buff(self):
         display_buff_width = Board.NUM_PIECES_PER_TEAM * 4 * ScreenCell.WIDTH + 1
         display_buff_height = Board.NUM_PIECES_PER_TEAM * 4 * ScreenCell.HEIGHT + 1
-        self.display_buff = [[None for i in range(
-            display_buff_width)] for j in range(display_buff_height)]
+        self.display_buff = [
+            [None for i in range(display_buff_width)]
+            for j in range(display_buff_height)
+        ]
 
     def flush_buffer(self):
         out: str = self.term.clear + self.term.home
         c: str = None
         for y_idx, line in enumerate(self.display_buff):
             for x_idx, c in enumerate(line):
-                if (c):
+                if c:
                     # TODO there's probably a better way to do this by concatenating the c's in
                     # one line first...
                     # print(c + "d")
                     out += self.term.move_xy(x_idx, y_idx) + c  # '█'
-        print(out, end='', flush=True)
+        print(out, end="", flush=True)
 
     def get_draw_bounds(self, pieces: List[ScreenPos]):
         (min_x, max_x, min_y, max_y) = self.get_bounds(pieces)
@@ -99,7 +101,7 @@ class ScreenManager:
             min_x - ScreenCell.PAD_LEFT,
             max_x + ScreenCell.PAD_RIGHT,
             min_y - ScreenCell.PAD_TOP,
-            max_y + ScreenCell.PAD_BOTTOM
+            max_y + ScreenCell.PAD_BOTTOM,
         )
 
     # TODO if needed make a datastructure for retrieving this sort of
@@ -115,24 +117,19 @@ class ScreenManager:
 
         max_y = reduce(lambda y1, y2: max(y1, y2), map(lambda p: p.y, pieces))
 
-        return (
-            min_x,
-            max_x,
-            min_y,
-            max_y
-        )
+        return (min_x, max_x, min_y, max_y)
 
 
-r'''
+r"""
  \__/  \__/
  /  \__/  \
  \__/  \__/
  /  \__/  \
-'''
-r'''
+"""
+r"""
  \___/ 2 \___/
  / 2 \___/ 1 \
  \___/ 1 \___/
  /   \___/   \
 
-'''
+"""

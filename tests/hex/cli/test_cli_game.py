@@ -12,9 +12,10 @@ class TestCliGame:
     def extract_positions(self, board: Board):
         return map(lambda piece: (piece, ScreenPos(piece.pos)), board.pieces.values())
 
-    @pytest.mark.parametrize('placements,expected_bounds', [
-        (((0, 0, 0), (1, -1, 0), (0, 0, 1)), (0, 4, -1, 1))
-    ])
+    @pytest.mark.parametrize(
+        "placements,expected_bounds",
+        [(((0, 0, 0), (1, -1, 0), (0, 0, 1)), (0, 4, -1, 1))],
+    )
     def test_get_bounds(self, placements, expected_bounds):
         board = Board()
         mgr = ScreenManager(board, Mock())
@@ -28,5 +29,3 @@ class TestCliGame:
         print("===========")
         actual_bounds = mgr.get_bounds(list(map(lambda tup: tup[1], pieces)))
         assert actual_bounds == expected_bounds
-
-
