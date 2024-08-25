@@ -12,6 +12,6 @@ class Keys:
 # https://github.com/jquast/blessed/blob/167c34e5268cacb4501418e71e9b926b80dfe077/blessed/keyboard.py#L24
 
 Keys.UP = 259
-Keys.DOWN = 259
+Keys.DOWN = 258
 Keys.LEFT = 260
 Keys.RIGHT = 261

@@ -9,10 +9,21 @@ class Position:
     a: int  # array
     r: int  # row
     c: int  # column
-    # def __init__(self, a, r, c):
-    #     self.a = a
-    #     self.r = r
-    #     self.c = c
+    def __init__(self, *args, **kwargs):
+        if len(args) == 1:
+            pos = args[0]
+            self.a = pos.a
+            self.r = pos.r
+            self.c = pos.c
+
+        elif len(args) == 3:
+            self.a = args[0]
+            self.r = args[1]
+            self.c = args[2]
+        
+        else:
+            raise ValueError(f"Invalid input to Position constructor: args:{args}, kwargs:{kwargs}")
+        
 
     # TODO move this stuff into the board class?
     # https://en.wikipedia.org/wiki/Hexagonal_Efficient_Coordinate_System#/media/File:HECS_Nearest_Neighbors.png

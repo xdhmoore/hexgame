@@ -11,7 +11,7 @@ class Board:
 
     def __init__(self) -> None:
         # TODO might be interesting to implement this with a small graph db like cogdb
-        # RESUME - make this a map from hex location to piece
+        # TODO - make this a map from hex location to piece
         self.pieces = dict()
         self.edgeHead = None
         self.edgeTail = None

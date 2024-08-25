@@ -55,7 +55,7 @@ class ScreenCell:
                     y = y_idx - self.PAD_TOP + screen_coords[0]
                     x = x_idx - self.PAD_LEFT + screen_coords[1]
 
-                    # RESUME chagne to handle 3 cases:
+                    # TODO chagne to handle 3 cases:
                     # - when inside - draw
                     # - when just over - ignore
                     # - when way over - fail

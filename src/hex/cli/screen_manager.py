@@ -7,6 +7,7 @@ from hex.cli.keys import Keys
 from hex.cli.screen_cell import ScreenCell
 from hex.cli.screen_position import ScreenPos
 from hex.cli.selector_cell import SelectorCell
+from hex.position import Position
 
 
 class ScreenManager:
@@ -64,7 +65,7 @@ class ScreenManager:
         return ((self.term.height - 1) // 2, (self.term.width - 1) // 2)
 
     def init_selector(self) -> None:
-        self.selector = SelectorCell(ScreenPos(0, 0))
+        self.selector = SelectorCell(Position(0, 0, 0))
         self.dirty = True
 
     def move_selector(self, key: int) -> None:
