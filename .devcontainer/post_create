@@ -4,5 +4,6 @@ git config --global init.defaultBranch mainline
 git config --global --add safe.directory .(:A)
 
 # Discover all the tests. I think this helps VS Code find them and show the UI run test buttons in the margin
-pytest --collect-only
+# TODO this breaks the container build when there is a circular import
+#pytest --collect-only
 

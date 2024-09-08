@@ -1,6 +1,5 @@
 from typing import List
 
-from hex.board import Board
 from hex.position import Position
 
 
