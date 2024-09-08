@@ -19,13 +19,24 @@ class SelectorCell(ScreenCell):
         # RESUME - redo the hex to screen mapping to be 90deg like michael said
         match key.code:
             case Keys.UP:
-                new_pos = (self.pos.a + 1 % 2, self.pos.r -1, self.pos.c)
+                new_pos = self.pos._top_left().arc
+                # new_pos = (self.pos.a + 1 % 2, self.pos.r -1, self.pos.c)
             case Keys.DOWN:
-                new_pos = (self.pos.a + 1 % 2, self.pos.r+1, self.pos.c)
+                new_pos = self.pos._bottom_right().arc
+                #new_pos = (self.pos.a + 1 % 2, self.pos.r+1, self.pos.c)
+                # RESUME left and right don't work. How to calculate left/right in hex space
             case Keys.LEFT:
-                new_pos = (self.pos.a, self.pos.r, self.pos.c - 1)
+                if self.pos.a == 0:
+                    new_pos = self.pos._bottom_left().arc
+                else:
+                    new_pos = self.pos._mid_left().arc
+                # new_pos = (self.pos.a, self.pos.r, self.pos.c - 1)
             case Keys.RIGHT:
-                new_pos = (self.pos.a, self.pos.r, self.pos.c + 1)
+                if self.pos.a == 0:
+                    new_pos = self.pos._bottom_right().arc
+                else:
+                    new_pos = self.pos._mid_right().arc
+                # new_pos = (self.pos.a, self.pos.r, self.pos.c + 1)
             case default:
                 new_pos = self.pos.arc
 

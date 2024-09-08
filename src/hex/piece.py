@@ -1,4 +1,5 @@
 from typing import List
+
 from hex.board import Board
 from hex.position import Position
 
@@ -9,10 +10,23 @@ class Piece:
     # None
     def __init__(self, pos: Position):
         self.pos = pos
+        self.tr = None
+        self.mr = None
+        self.br = None
+        self.bl = None
+        self.ml = None
+        self.tl = None
 
     # Use board.place or move instead
     def _move(self, board: Board, dest: Position) -> None:
-        # print(f"{self.pos} -> {dest}")
+        self.pos = dest
+        self.tr = board.at(dest._top_right())
+        self.mr = board.at(dest._mid_right())
+        self.br = board.at(dest._bottom_right())
+        self.bl = board.at(dest._bottom_left())
+        self.ml = board.at(dest._mid_left())
+        self.tl = board.at(dest._top_left())
+
         if not self.is_move_valid(board, dest):
             raise ValueError
 
@@ -24,7 +38,8 @@ class Piece:
 
     def gen_valid_moves(self, board: Board) -> List[Position]:
         return list(
-            filter(lambda pos: not board.is_occupied(pos), self.gen_moves(board))
+            filter(lambda pos: not board.is_occupied(
+                pos), self.gen_moves(board))
         )
 
     # TODO cache this

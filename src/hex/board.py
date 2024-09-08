@@ -1,3 +1,4 @@
+from hex.piece import Piece
 from hex.position import Position
 from typing import Dict, List, Tuple
 
@@ -13,18 +14,24 @@ class Board:
         # TODO might be interesting to implement this with a small graph db like cogdb
         # TODO - make this a map from hex location to piece
         self.pieces = dict()
+        self.placements = dict()
         self.edgeHead = None
         self.edgeTail = None
         self.step = 0
 
-    def move(self, piece, pos):
+    def move(self, piece:Piece, pos:Position) -> None:
         piece._move(self, pos)
-        piece.pos = pos
         self.pieces[id(piece)] = piece
+        # TODO map to id instead to save space?
+        self.placements[piece.pos] = piece
         self.step += 1
 
     def take_step(self):
         self.step += 1
+
+
+    def at(self, pos:Position) -> Position:
+        return self.placements[pos]
 
     def is_occupied(self, pos: Position):
         # return len([filter(self.pieces.values if piece.pos.arc == pos.arc]) > 0
