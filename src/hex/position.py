@@ -1,25 +1,25 @@
 from dataclasses import dataclass
 from typing import Any, List, Self
 
-
 # TODO refactor to HexPosition or HEWhateverPosition
 @dataclass
 class Position:
-    # https://en.wikipedia.org/wiki/Hexagonal_Efficient_Coordinate_System
+    # Loosely inspired by https://en.wikipedia.org/wiki/Hexagonal_Efficient_Coordinate_System
     a: int  # array
-    r: int  # row
-    c: int  # column
+    x: int  # row
+    y: int  # column
+# RESUME find all usages and refactor to new coordinates
     def __init__(self, *args, **kwargs):
         if len(args) == 1:
             pos = args[0]
             self.a = pos.a
-            self.r = pos.r
-            self.c = pos.c
+            self.x = pos.x
+            self.y = pos.y
 
         elif len(args) == 3:
             self.a = args[0]
-            self.r = args[1]
-            self.c = args[2]
+            self.x = args[1]
+            self.y = args[2]
         
         else:
             raise ValueError(f"Invalid input to Position constructor: args:{args}, kwargs:{kwargs}")
@@ -29,11 +29,11 @@ class Position:
     # https://en.wikipedia.org/wiki/Hexagonal_Efficient_Coordinate_System#/media/File:HECS_Nearest_Neighbors.png
     def get_adjacent_positions(self) -> List[Self]:
         return [
+            self._top(),
             self._top_right(),
-            self._mid_right(),
             self._bottom_right(),
+            self._bottom(),
             self._bottom_left(),
-            self._mid_left(),
             self._top_left(),
         ]
 
@@ -41,32 +41,46 @@ class Position:
     # can only be 0 or 1
 
     def _top_right(self) -> Self:
-        return Position(1 - self.a, self.r - (1 - self.a), self.c + self.a)
-
-    def _mid_right(self) -> Self:
-        return Position(self.a, self.r, self.c + 1)
+        if self.a == 0:
+            return Position(1- self.a, self.x + 1, self.y)
+        else:
+            return Position(1- self.a, self.x + 1, self.y - 1)
 
     def _bottom_right(self) -> Self:
-        return Position(1 - self.a, self.r + self.a, self.c + self.a)
+        if self.a == 0:
+            return Position(1 - self.a, self.x + 1, self.y + 1)
+        else:
+            return Position(1 - self.a, self.x + 1, self.y)
+        
+    def _bottom(self) -> Self:
+            return Position(self.a, self.x, self.y + 1)
 
     def _bottom_left(self) -> Self:
-        return Position(1 - self.a, self.r + self.a, self.c - (1 - self.a))
-
-    def _mid_left(self) -> Self:
-        return Position(self.a, self.r, self.c - 1)
+        if self.a == 0:
+            return Position(1 - self.a, self.x - 1, self.y + 1)
+        else:
+            return Position(1 - self.a, self.x - 1, self.y)
 
     def _top_left(self) -> Self:
-        return Position(1 - self.a, self.r - (1 - self.a), self.c - (1 - self.a))
+        if (self.a == 0):
+            return Position(1- self.a, self.x - 1, self.y)
+        else:
+            return Position(1 - self.a, self.x - 1, self.y - 1)
+
+    
+    def _top(self) -> Self:
+        return Position(self.a, self.x, self.y - 1)
+
 
     def __str__(self):
-        return f"({self.a},{self.r},{self.c})"
+        return f"({self.a},{self.x},{self.y})"
 
     def __repr__(self):
         return self.__str__()
 
     @property
-    def arc(self):
-        return (self.a, self.r, self.c)
+    def axy(self):
+        return (self.a, self.x, self.y)
 
 
 Position.START = Position(0, 0, 0)

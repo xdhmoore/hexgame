@@ -96,6 +96,7 @@ class ScreenManager:
         print(out, end="", flush=True)
 
     def get_draw_bounds(self, pieces: List[ScreenPos]):
+        # TODO fix this to first get hex coord bounds, then convert
         (min_x, max_x, min_y, max_y) = self.get_bounds(pieces)
         # TODO
         return (

@@ -14,24 +14,24 @@ class Board:
         # TODO might be interesting to implement this with a small graph db like cogdb
         # TODO - make this a map from hex location to piece
         self.pieces = dict()
-        self.placements = dict()
+        # self.placements = dict()
         self.edgeHead = None
         self.edgeTail = None
         self.step = 0
 
     def move(self, piece:Piece, pos:Position) -> None:
-        piece._move(self, pos)
+        piece._move(pos)
         self.pieces[id(piece)] = piece
         # TODO map to id instead to save space?
-        self.placements[piece.pos] = piece
+        # //self.placements[piece.pos] = piece
         self.step += 1
 
     def take_step(self):
         self.step += 1
 
 
-    def at(self, pos:Position) -> Position:
-        return self.placements[pos]
+    # def at(self, pos:Position) -> Position:
+    #     return self.placements[pos]
 
     def is_occupied(self, pos: Position):
         # return len([filter(self.pieces.values if piece.pos.arc == pos.arc]) > 0
@@ -39,7 +39,7 @@ class Board:
         return (
             len(
                 list(
-                    filter(lambda piece: piece.pos.arc == pos.arc, self.pieces.values())
+                    filter(lambda piece: piece.pos.axy == pos.axy, self.pieces.values())
                 )
             )
             > 0

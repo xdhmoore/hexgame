@@ -32,9 +32,12 @@ class ScreenPos:
             hex_pos = Position(*args[0:3])
 
         if hex_pos is not None:
-            # self.x = hex_pos.a - (3 * hex_pos.r) + 4 * hex_pos.c
-            self.x = (-4 * hex_pos.r) + 4 * hex_pos.c
-            self.y = 2 * hex_pos.a + 3 * hex_pos.r + hex_pos.c
+            if (hex_pos.a == 0):
+                self.x = 4 * hex_pos.x
+                self.y = 2 * hex_pos.y
+            else:
+                self.x = 4 * hex_pos.x
+                self.y = 2 * hex_pos.y - 1
             return
 
         if len(args) == 2 and len(kwargs.keys()) == 0:

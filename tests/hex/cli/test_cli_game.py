@@ -12,20 +12,21 @@ class TestCliGame:
     def extract_positions(self, board: Board):
         return map(lambda piece: (piece, ScreenPos(piece.pos)), board.pieces.values())
 
-    @pytest.mark.parametrize(
-        "placements,expected_bounds",
-        [(((0, 0, 0), (1, -1, 0), (0, 0, 1)), (0, 4, -1, 1))],
-    )
-    def test_get_bounds(self, placements, expected_bounds):
-        board = Board()
-        mgr = ScreenManager(board, Mock())
+#  TODO this function isn't used yet and I've redone the coords. also should probably use hex coords
+    # @pytest.mark.parametrize(
+    #     "placements,expected_bounds",
+    #     [(((0, 0, 0), (1, -1, 0), (0, 0, 1)), (0, 4, -1, 1))],
+    # )
+    # def test_get_bounds(self, placements, expected_bounds):
+    #     board = Board()
+    #     mgr = ScreenManager(board, Mock())
 
-        for placement in placements:
-            piece = Piece(None)
-            board.move(piece, Position(*placement))
-        pieces = list(self.extract_positions(board))
-        print("===========")
-        print(list(map(lambda tup: tup[1], pieces)))
-        print("===========")
-        actual_bounds = mgr.get_bounds(list(map(lambda tup: tup[1], pieces)))
-        assert actual_bounds == expected_bounds
+    #     for placement in placements:
+    #         piece = Piece(None)
+    #         board.move(piece, Position(*placement))
+    #     pieces = list(self.extract_positions(board))
+    #     print("===========")
+    #     print(list(map(lambda tup: tup[1], pieces)))
+    #     print("===========")
+    #     actual_bounds = mgr.get_bounds(list(map(lambda tup: tup[1], pieces)))
+    #     assert actual_bounds == expected_bounds

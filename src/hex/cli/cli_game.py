@@ -42,6 +42,7 @@ class CliGame:
     # System Seq Diagram : [MermaidChart: 1d3677c8-35c2-4a64-9971-d59d7e11e9bd]
     # Seq Diagram: [MermaidChart: 0cc01e70-aa53-4810-889d-46c95a7dcfb3]
     def main(self) -> None:
+        
         term = blessed.Terminal()
         with term.fullscreen(), term.cbreak(), term.hidden_cursor():
             print(term.home + term.clear)
@@ -53,11 +54,11 @@ class CliGame:
             # board.move(piece1, Position(0, 0, 0))
             # TODO try these 3 next:
             piece1 = Piece(None)
-            board.move(piece1, Position(0, -1, 0))
+            board.move(piece1, Position(0, 2, -1))
             piece2 = Piece(None)
-            board.move(piece2, Position(0, 0, -1))
+            board.move(piece2, Position(1, 1, 1))
             piece3 = Piece(None)
-            board.move(piece3, Position(0, 0, 1))
+            board.move(piece3, Position(0, 0, -1))
             key = None
             while key != "q":
                 # TODO - best I can tell, inkey() only returns an obj with
