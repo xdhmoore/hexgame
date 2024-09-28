@@ -1,14 +1,16 @@
 from dataclasses import dataclass
 from typing import Any, List, Self
 
+
 # TODO refactor to HexPosition or HEWhateverPosition
-@dataclass
+@dataclass(eq=True, unsafe_hash=True)
 class Position:
     # Loosely inspired by https://en.wikipedia.org/wiki/Hexagonal_Efficient_Coordinate_System
     a: int  # array
     x: int  # row
     y: int  # column
 # RESUME find all usages and refactor to new coordinates
+
     def __init__(self, *args, **kwargs):
         if len(args) == 1:
             pos = args[0]
@@ -20,13 +22,14 @@ class Position:
             self.a = args[0]
             self.x = args[1]
             self.y = args[2]
-        
+
         else:
-            raise ValueError(f"Invalid input to Position constructor: args:{args}, kwargs:{kwargs}")
-        
+            raise ValueError(f"Invalid input to Position constructor: args:{
+                             args}, kwargs:{kwargs}")
 
     # TODO move this stuff into the board class?
     # https://en.wikipedia.org/wiki/Hexagonal_Efficient_Coordinate_System#/media/File:HECS_Nearest_Neighbors.png
+
     def get_adjacent_positions(self) -> List[Self]:
         return [
             self._top(),
@@ -42,18 +45,18 @@ class Position:
 
     def _top_right(self) -> Self:
         if self.a == 0:
-            return Position(1- self.a, self.x + 1, self.y)
+            return Position(1 - self.a, self.x + 1, self.y)
         else:
-            return Position(1- self.a, self.x + 1, self.y - 1)
+            return Position(1 - self.a, self.x + 1, self.y - 1)
 
     def _bottom_right(self) -> Self:
         if self.a == 0:
             return Position(1 - self.a, self.x + 1, self.y + 1)
         else:
             return Position(1 - self.a, self.x + 1, self.y)
-        
+
     def _bottom(self) -> Self:
-            return Position(self.a, self.x, self.y + 1)
+        return Position(self.a, self.x, self.y + 1)
 
     def _bottom_left(self) -> Self:
         if self.a == 0:
@@ -63,14 +66,12 @@ class Position:
 
     def _top_left(self) -> Self:
         if (self.a == 0):
-            return Position(1- self.a, self.x - 1, self.y)
+            return Position(1 - self.a, self.x - 1, self.y)
         else:
             return Position(1 - self.a, self.x - 1, self.y - 1)
 
-    
     def _top(self) -> Self:
         return Position(self.a, self.x, self.y - 1)
-
 
     def __str__(self):
         return f"({self.a},{self.x},{self.y})"

@@ -1,5 +1,6 @@
 from typing import List
 
+from hex.piece_type import PieceType
 from hex.position import Position
 
 
@@ -7,8 +8,9 @@ class Piece:
 
     # TODO use kwargs so that pos is optional instead of requireing
     # None
-    def __init__(self, pos: Position):
+    def __init__(self, pos: Position, type: PieceType):
         self.pos = pos
+        self.type = type
 
     # Use board.place or move instead
     def _move(self, dest: Position) -> None:

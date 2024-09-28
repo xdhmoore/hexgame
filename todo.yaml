@@ -30,3 +30,4 @@ someday maybe:
   - make a new front end with react (svg? webgl? webgl next?)
   - play someone else over a network using websockets
   - make engine for running large numbers of simulations of the game
+  - make log pane on the right or the left

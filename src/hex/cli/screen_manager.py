@@ -7,6 +7,7 @@ from hex.cli.keys import Keys
 from hex.cli.screen_cell import ScreenCell
 from hex.cli.screen_position import ScreenPos
 from hex.cli.selector_cell import SelectorCell
+from hex.cli.templates.template import Template
 from hex.position import Position
 
 
@@ -65,19 +66,20 @@ class ScreenManager:
         return ((self.term.height - 1) // 2, (self.term.width - 1) // 2)
 
     def init_selector(self) -> None:
-        self.selector = SelectorCell(Position(0, 0, 0))
+        self.selector = SelectorCell(Position(0, 0, 0), self.board.get_piece_at_pos(Position(0,0,0)), self.board)
+
         self.dirty = True
 
     def move_selector(self, key: int) -> None:
         assert self.selector != None
 
         # TODO eventually may want to return T/F from this so it's not dirty if you run into an edge and can't move
-        self.selector.move(key)
+        self.selector.move(key, self.board)
         self.dirty = True
 
     def clear_display_buff(self):
-        display_buff_width = Board.NUM_PIECES_PER_TEAM * 4 * ScreenCell.WIDTH + 1
-        display_buff_height = Board.NUM_PIECES_PER_TEAM * 4 * ScreenCell.HEIGHT + 1
+        display_buff_width = Board.NUM_PIECES_PER_TEAM * 4 * Template.WIDTH + 1
+        display_buff_height = Board.NUM_PIECES_PER_TEAM * 4 * Template.HEIGHT + 1
         self.display_buff = [
             [None for i in range(display_buff_width)]
             for j in range(display_buff_height)

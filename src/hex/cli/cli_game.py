@@ -1,18 +1,20 @@
+import logging
+import re
 from dataclasses import dataclass
 from functools import reduce
+from inspect import cleandoc
+from pprint import pprint
 from typing import Dict, List
-from blessed import Terminal
+
 import blessed
+from blessed import Terminal
+
 from hex.board import Board
 from hex.cli.keys import Keys
 from hex.cli.screen_manager import ScreenManager
 from hex.piece import Piece
+from hex.piece_type import PieceType
 from hex.position import Position
-from inspect import cleandoc
-
-from pprint import pprint
-import logging
-import re
 
 # TODO
 """
@@ -42,7 +44,7 @@ class CliGame:
     # System Seq Diagram : [MermaidChart: 1d3677c8-35c2-4a64-9971-d59d7e11e9bd]
     # Seq Diagram: [MermaidChart: 0cc01e70-aa53-4810-889d-46c95a7dcfb3]
     def main(self) -> None:
-        
+
         term = blessed.Terminal()
         with term.fullscreen(), term.cbreak(), term.hidden_cursor():
             print(term.home + term.clear)
@@ -53,11 +55,11 @@ class CliGame:
             # piece1 = Piece(None)
             # board.move(piece1, Position(0, 0, 0))
             # TODO try these 3 next:
-            piece1 = Piece(None)
+            piece1 = Piece(None, PieceType.Queen)
             board.move(piece1, Position(0, 2, -1))
-            piece2 = Piece(None)
+            piece2 = Piece(None, PieceType.Ant)
             board.move(piece2, Position(1, 1, 1))
-            piece3 = Piece(None)
+            piece3 = Piece(None, PieceType.Grasshopper)
             board.move(piece3, Position(0, 0, -1))
             key = None
             while key != "q":
@@ -72,9 +74,11 @@ class CliGame:
                             mgr.init_selector()
                         else:
                             mgr.move_selector(key)
+                    elif key.code == term.ENTER:
+                        mgr.selector.activate()
 
                 mgr.display()
-                key = term.inkey(timeout=0.5)
+                key = term.inkey(timeout=5.5)
             # x = input()
 
 
