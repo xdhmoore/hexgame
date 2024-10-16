@@ -1,3 +1,4 @@
+from blessed import Terminal
 from hex.board import Board
 from hex.cli.keys import Keys
 from hex.cli.screen_cell import ScreenCell
@@ -9,7 +10,7 @@ from hex.position import Position
 
 
 class SelectorCell(ScreenCell):
-    def __init__(self, pos: Position, piece: Piece, board:Board):
+    def __init__(self, pos: Position, piece: Piece, board:Board, term: Terminal):
         self._pos = pos
         self.activate = False
         self.template = None
@@ -17,12 +18,12 @@ class SelectorCell(ScreenCell):
         self.piece = board.get_piece_at_pos(self._pos)
         if (not self.piece is None):
             # // TODO remove duplciated work from move() func
-            self.template = Template.from_type(self.piece.type, overrides=dict(bold=True));
+            self.template = Template.from_type(self.piece.type, term, overrides=dict(bold=True));
         else: 
-            self.template = Template.from_type(PieceType.NoPiece, overrides=dict(bold=True));
+            self.template = Template.from_type(PieceType.NoPiece, term, overrides=dict(bold=True));
 
 
-    def move(self, key: int, board: Board):
+    def move(self, key: int, board: Board, term: Terminal):
         # TODO may need to grab the piece of the dest place to be able to display it's name
         # Also may want to convert to hex coordinates? or maybe that's unneeded
         # a, r, c
@@ -58,8 +59,8 @@ class SelectorCell(ScreenCell):
         # self.template = Template.from_type(self.piece.type)
         if (not self.piece is None):
             # // TODO remove duplciated work from move() func
-            self.template = Template.from_type(self.piece.type, overrides=dict(bold=True));
+            self.template = Template.from_type(self.piece.type, term, overrides=dict(bold=True));
         else: 
-            self.template = Template.from_type(PieceType.NoPiece, overrides=dict(bold=True));
+            self.template = Template.from_type(PieceType.NoPiece, term, overrides=dict(bold=True));
 
         

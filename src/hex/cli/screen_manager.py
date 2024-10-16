@@ -1,7 +1,9 @@
-from functools import reduce
 import logging
+from functools import reduce
 from typing import List
+
 from blessed import Terminal
+
 from hex.board import Board
 from hex.cli.keys import Keys
 from hex.cli.screen_cell import ScreenCell
@@ -38,12 +40,13 @@ class ScreenManager:
         self.flush_buffer()
 
     def get_cells_to_draw(self) -> List[ScreenCell]:
-        cells = [ScreenCell(piece) for piece in self.board.pieces.values()] + [
+        cells = [ScreenCell(piece, self.term) for piece in self.board.pieces.values()] + [
             self.selector
         ]
 
     def draw_pieces(self) -> None:
-        cells = [ScreenCell(piece) for piece in self.board.pieces.values()]
+        cells = [ScreenCell(self.term, piece)
+                 for piece in self.board.pieces.values()]
         self.draw_cells(cells)
 
     def draw_selector(self) -> None:
@@ -51,12 +54,12 @@ class ScreenManager:
             self.draw_cells([self.selector])
 
     # TODO Make more typing mandatory -> Stuff
-    # TODO add more docstrings
     def draw_cells(self, screen_cells) -> None:
         """Draws pieces and selector"""
 
         for screen_cell in screen_cells:
-            screen_cell.draw(self.term, self.display_buff, self.get_viewport_offset())
+            screen_cell.draw(self.term, self.display_buff,
+                             self.get_viewport_offset())
 
     # TODO right now this functions as the viewport but at some point will want to make the viewport moveable
     def get_viewport_offset(self):
@@ -66,7 +69,8 @@ class ScreenManager:
         return ((self.term.height - 1) // 2, (self.term.width - 1) // 2)
 
     def init_selector(self) -> None:
-        self.selector = SelectorCell(Position(0, 0, 0), self.board.get_piece_at_pos(Position(0,0,0)), self.board)
+        self.selector = SelectorCell(Position(0, 0, 0), self.board.get_piece_at_pos(
+            Position(0, 0, 0)), self.board, self.term)
 
         self.dirty = True
 
@@ -74,7 +78,7 @@ class ScreenManager:
         assert self.selector != None
 
         # TODO eventually may want to return T/F from this so it's not dirty if you run into an edge and can't move
-        self.selector.move(key, self.board)
+        self.selector.move(key, self.board, self.term)
         self.dirty = True
 
     def clear_display_buff(self):

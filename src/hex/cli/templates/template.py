@@ -1,5 +1,7 @@
 import re
 from typing import Dict
+
+from blessed import Terminal
 from hex.piece_type import PieceType
 
 class Template:
@@ -13,7 +15,7 @@ class Template:
     def __init__(self, **kwargs):
         self.options = kwargs;
         self.drawing = kwargs.get('drawing', Template.DEFAULT_DRAWING)
-        self.color = kwargs.get('color', 'white')
+        self.color = kwargs.get('color', None)
         self.bold = kwargs.get('bold', False)
         self.label = kwargs.get('label', 'a')
         self.piece_type = kwargs.get('piece_type', None)
@@ -80,24 +82,28 @@ class Template:
                         # If it's not the center of the tile, just ignore if if it's over the edge of the board
                         # but only within an allowance
                         continue
-                    if self.bold:
-                        buffer[y][x] = term.bold_green(c)
+                    if c == 'c':
+                        c = self.CENTER_CHAR
+                    if self.color:
+                        buffer[y][x] = self.color + c + term.normal
                     else:
                         buffer[y][x] = c
+                        
+                        
 
     @classmethod
-    def from_type(cls, piece_type: PieceType, overrides: Dict[str,any]=dict()) -> None:
+    def from_type(cls, piece_type: PieceType, term: Terminal, overrides: Dict[str,any]=dict()) -> None:
         match piece_type:
             case PieceType.Queen:
-                return Template(label='q', piece_type=PieceType.Queen, **overrides)
+                return Template(label='q', piece_type=PieceType.Queen, color=term.khaki1,**overrides)
             case PieceType.Ant:
-                return Template(label='a', piece_type=PieceType.Ant, **overrides)
+                return Template(label='a', piece_type=PieceType.Ant, color=term.firebrick,**overrides)
             case PieceType.Beetle:
-                return Template(label='b', piece_type = PieceType.Beetle, **overrides)
+                return Template(label='b', piece_type = PieceType.Beetle, color=term.aqua, **overrides)
             case PieceType.Spider:
-                return Template(label='s', piece_type=PieceType.Spider, **overrides)
+                return Template(label='s', piece_type=PieceType.Spider, color=term.purple, **overrides)
             case PieceType.Grasshopper:
-                return Template(label='g', piece_type = PieceType.Grasshopper, **overrides)
+                return Template(label='g', piece_type = PieceType.Grasshopper, color=term.webgreen, **overrides)
             case PieceType.NoPiece:
                 return Template(label=' ', piece_type = PieceType.NoPiece, **overrides)
             case _:

@@ -14,7 +14,7 @@ from hex.position import Position
 
 class ScreenCell:
 
-    def __init__(self, piece: Piece = None, pos: Position = None):
+    def __init__(self,term: Terminal, piece: Piece = None, pos: Position = None):
 
         if not piece is None and not pos is None:
 
@@ -35,7 +35,7 @@ class ScreenCell:
         else:
             assert False
 
-        self.template = Template.from_type(piece.type)
+        self.template = Template.from_type(piece.type, term)
 
     def draw(self, term: Terminal, buffer, viewport_offset: tuple[int, int] = (0, 0)):
         """

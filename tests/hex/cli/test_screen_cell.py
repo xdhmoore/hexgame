@@ -2,6 +2,7 @@ from pprint import pprint
 from typing import List
 from unittest.mock import Mock
 
+import blessed
 import pytest
 
 from hex.board import Board
@@ -32,7 +33,7 @@ class TestScreenCell:
         BUFF_SIZE = 20
         OFFSET = BUFF_SIZE // 2 - 1
         display_buff = self.new_buffer(20)
-        screen_cell = ScreenCell(pos=Position(*hex_pos))
+        screen_cell = ScreenCell(Position(*hex_pos), blessed.Terminal())
         screen_cell.draw(
             term=Mock(), buffer=display_buff, viewport_offset=(OFFSET, OFFSET)
         )
