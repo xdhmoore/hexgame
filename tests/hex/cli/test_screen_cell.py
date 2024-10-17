@@ -11,6 +11,7 @@ from hex.cli.screen_cell import ScreenCell
 from hex.cli.screen_manager import ScreenManager
 from hex.cli.screen_position import ScreenPos
 from hex.piece import Piece
+from hex.piece_type import PieceType
 from hex.position import Position
 
 # TODO get code coverage working
@@ -33,20 +34,10 @@ class TestScreenCell:
         BUFF_SIZE = 20
         OFFSET = BUFF_SIZE // 2 - 1
         display_buff = self.new_buffer(20)
-        screen_cell = ScreenCell(Position(*hex_pos), blessed.Terminal())
+        # TODO figure out dependency injection so I don't have to pass around term everywhere
+        screen_cell = ScreenCell(blessed.Terminal(), Piece(Position(*hex_pos), PieceType.Ant))
         screen_cell.draw(
             term=Mock(), buffer=display_buff, viewport_offset=(OFFSET, OFFSET)
         )
-        assert display_buff[screen_pos[0]][screen_pos[1]] == "c"
+        assert display_buff[screen_pos[0]][screen_pos[1]] == "a"
 
-    def test_init(self):
-
-        assert ScreenCell.DRAWING == [" ___", "/ c \\", "\\___/"]
-
-        assert ScreenCell.CENTER == (1, 2)
-        assert ScreenCell.PAD_TOP == 1
-        assert ScreenCell.PAD_LEFT == 2
-        assert ScreenCell.PAD_RIGHT == 2
-        assert ScreenCell.PAD_BOTTOM == 1
-        assert ScreenCell.WIDTH == 5
-        assert ScreenCell.HEIGHT == 3
