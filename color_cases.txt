@@ -1,0 +1,27 @@
+plain: screen_cell
+         ___
+        / c \
+        \___/
+
+hovered: selector_cell
+         ___
+        / c \ bold c
+        \___/
+         ___
+        /   \ empty white
+        \___/
+
+selected: selector_cell
+         ___
+        / c \ bold c & outline
+        \___/
+
+available move: selector_cell
+         ___
+        /   \ color of selected piece
+        \___/
+
+selected piece to move: selector_cell
+         ___
+        /   \ bold outline, color of moving piece
+        \___/

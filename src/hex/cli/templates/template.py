@@ -16,7 +16,9 @@ class Template:
         self.options = kwargs;
         self.drawing = kwargs.get('drawing', Template.DEFAULT_DRAWING)
         self.color = kwargs.get('color', None)
-        self.bold = kwargs.get('bold', False)
+        self.default_color = kwargs.get('default_color', None)
+        self.bold_label = kwargs.get('bold_label', False)
+        self.bold_lines = kwargs.get('bold_lines', False)
         self.label = kwargs.get('label', 'a')
         self.piece_type = kwargs.get('piece_type', None)
 
@@ -82,28 +84,47 @@ class Template:
                         # If it's not the center of the tile, just ignore if if it's over the edge of the board
                         # but only within an allowance
                         continue
-                    if c == 'c':
+                    is_label = c == 'c'
+                    if is_label:
                         c = self.CENTER_CHAR
+
                     if self.color:
-                        buffer[y][x] = self.color + c + term.normal
+                        color = self.color
                     else:
-                        buffer[y][x] = c
+                        color = self.default_color
+
+                    # RESUME fix this logic, also initialize template.from_type correctly
+                    # everywhere
+                    if is_label:
+                        if self.bold_label:
+                            bold_label = term.bold
+                        else:
+                            bold_label = ''
+                        if self.color:
+                            buffer[y][x] = term.bold(color + c) + term.normal
+                        else:
+                            buffer[y][x] = bold_label + c + term.normal
+                    else:
+                        if self.color:
+                            buffer[y][x] = color + c + term.normal
+                        else:
+                            buffer[y][x] = c
                         
                         
 
     @classmethod
-    def from_type(cls, piece_type: PieceType, term: Terminal, overrides: Dict[str,any]=dict()) -> None:
+    def from_type(cls, piece_type: PieceType, term: Terminal, **overrides: Dict[str,any]) -> None:
         match piece_type:
             case PieceType.Queen:
-                return Template(label='q', piece_type=PieceType.Queen, color=term.khaki1,**overrides)
+                return Template(label='q', piece_type=PieceType.Queen, default_color=term.khaki1,**overrides)
             case PieceType.Ant:
-                return Template(label='a', piece_type=PieceType.Ant, color=term.firebrick,**overrides)
+                return Template(label='a', piece_type=PieceType.Ant, default_color=term.firebrick,**overrides)
             case PieceType.Beetle:
-                return Template(label='b', piece_type = PieceType.Beetle, color=term.aqua, **overrides)
+                return Template(label='b', piece_type = PieceType.Beetle, default_color=term.aqua, **overrides)
             case PieceType.Spider:
-                return Template(label='s', piece_type=PieceType.Spider, color=term.purple, **overrides)
+                return Template(label='s', piece_type=PieceType.Spider, default_color=term.purple, **overrides)
             case PieceType.Grasshopper:
-                return Template(label='g', piece_type = PieceType.Grasshopper, color=term.webgreen, **overrides)
+                return Template(label='g', piece_type = PieceType.Grasshopper, default_color=term.webgreen, **overrides)
             case PieceType.NoPiece:
                 return Template(label=' ', piece_type = PieceType.NoPiece, **overrides)
             case _:
