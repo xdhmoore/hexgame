@@ -2,14 +2,18 @@ import re
 from typing import Dict
 
 from blessed import Terminal
+from hex.cli.templates.template_style import TemplateStyle
 from hex.piece_type import PieceType
 
 class Template:
 
+    # . is replaced by block or whitespace
+    # i is replaced by block or _
+    # c is replaced by label
     DEFAULT_DRAWING = r"""
          ___
-        / c \
-        \___/
+        /.c.\
+        \iii/
     """
 
     def __init__(self, **kwargs):
@@ -57,9 +61,10 @@ class Template:
         self.PAD_BOTTOM = num_lines - self.CENTER[0] - 1
         self.WIDTH = self.PAD_LEFT + 1 + self.PAD_RIGHT
         self.HEIGHT = self.PAD_TOP + 1 + self.PAD_BOTTOM
+        # TODO we shouldn't have to compute all of the above on every instance
 
 
-    def draw(self, term, buffer, coords, active):
+    def draw(self, term, buffer, coords, style: TemplateStyle):
         for y_idx, line in enumerate(self.DRAWING):
             for x_idx, c in enumerate(line):
                 # TODO pass in piece and display different symbol per kind and different color per player
@@ -88,28 +93,58 @@ class Template:
                     if is_label:
                         c = self.CENTER_CHAR
 
-                    if self.color:
-                        color = self.color
-                    else:
+                    is_bottom_edge = c == 'i'
+                    is_filling = c == '.'
+
+
+                    if style == TemplateStyle.Plain:
                         color = self.default_color
+                        if is_bottom_edge:
+                            c = '_'
+                        if is_filling:
+                            c = ' '
+                        buffer[y][x] = color + c + term.normal
+
+                    if style == TemplateStyle.Hover or style == TemplateStyle.Targetted:
+                        if not is_label:
+
+                            color = term.bold_lawngreen
+                        else:
+                            color = self.default_color
+                        if is_bottom_edge:
+                            c = '_'
+                        if is_filling:
+                            c = ' '
+                        buffer[y][x] = color + c + term.normal
+
+                    if style == TemplateStyle.Selected:
+                        if is_bottom_edge or is_filling:
+                            c = '█'
+                        if not is_label:
+                            color = term.bold_lawngreen
+                        else:
+                            color =  self.default_color
+                        buffer[y][x] = color + c + term.normal
+                        
+                            
 
                     # https://fsymbols.com/images/ascii.png
                     # RESUME fix this logic, also initialize template.from_type correctly
                     # everywhere
-                    if is_label:
-                        if self.bold_label:
-                            bold_label = term.bold
-                        else:
-                            bold_label = ''
-                        if self.color:
-                            buffer[y][x] = term.bold(color + c) + term.normal
-                        else:
-                            buffer[y][x] = bold_label + c + term.normal
-                    else:
-                        if self.color:
-                            buffer[y][x] = color + c + term.normal
-                        else:
-                            buffer[y][x] = c
+                    # if is_label:
+                    #     if self.bold_label:
+                    #         bold_label = term.bold
+                    #     else:
+                    #         bold_label = ''
+                    #     if self.color:
+                    #         buffer[y][x] = term.bold(color + c) + term.normal
+                    #     else:
+                    #         buffer[y][x] = bold_label + c + term.normal
+                    # else:
+                    #     if self.color:
+                    #         buffer[y][x] = color + c + term.normal
+                    #     else:
+                    #         buffer[y][x] = c
                         
                         
 
@@ -127,7 +162,7 @@ class Template:
             case PieceType.Grasshopper:
                 return Template(label='g', piece_type = PieceType.Grasshopper, default_color=term.webgreen, **overrides)
             case PieceType.NoPiece:
-                return Template(label=' ', piece_type = PieceType.NoPiece, **overrides)
+                return Template(label=' ', piece_type = PieceType.NoPiece, default_color=term.white, **overrides)
             case _:
                 assert False
         
