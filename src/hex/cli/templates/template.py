@@ -93,6 +93,7 @@ class Template:
                     else:
                         color = self.default_color
 
+                    # https://fsymbols.com/images/ascii.png
                     # RESUME fix this logic, also initialize template.from_type correctly
                     # everywhere
                     if is_label:

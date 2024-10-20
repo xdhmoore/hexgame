@@ -5,23 +5,21 @@ plain: screen_cell
 
 hovered: selector_cell
          ___
-        / c \ bold c
+        / c \ outline in bright green
         \___/
          ___
-        /   \ empty white
+        /   \ empty bright green
         \___/
 
 selected: selector_cell
          ___
-        / c \ bold c & outline
-        \___/
+        /█c█\ outline bright green, interior default
+        \███/
 
-available move: selector_cell
+dest available to move: selector_cell
          ___
-        /   \ color of selected piece
-        \___/
-
-selected piece to move: selector_cell
+        /███\ color of moving piece
+        \███/
          ___
-        /   \ bold outline, color of moving piece
-        \___/
+        /█c█\ color of moving piece, except c of existing piece
+        \███/
