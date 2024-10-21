@@ -1,26 +1,30 @@
-plain: screen_cell
-         ___
-        / c \
-        \___/
 
-hovered: selector_cell
-         ___
-        / c \ outline in bright green
-        \___/
-         ___
-        /   \ empty bright green
-        \___/
+plain:
+all red
+     ___
+    / a \
+    \___/
 
-selected: selector_cell
-         ___
-        /█c█\ outline bright green, interior default
-        \███/
+hover:
+edges green, label red
+     ___
+    / a \
+    \___/
+     ___
+    /   \
+    \___/
 
-dest available to move: selector_cell
-         ___
-        /███\ color of moving piece
-        \███/
-         ___
-        /█c█\ color of moving piece, except c of existing piece
-        \███/
+selected:
+all green, label red
+     ___
+    /█a█\
+    \███/
 
+targetted:
+outline green, label red
+     ___
+    / a \
+    \___/
+     ___
+    /   \
+    \___/

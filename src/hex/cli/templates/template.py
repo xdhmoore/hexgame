@@ -2,8 +2,11 @@ import re
 from typing import Dict
 
 from blessed import Terminal
+
 from hex.cli.templates.template_style import TemplateStyle
 from hex.piece_type import PieceType
+from hex.player import Player
+
 
 class Template:
 
@@ -17,7 +20,7 @@ class Template:
     """
 
     def __init__(self, **kwargs):
-        self.options = kwargs;
+        self.options = kwargs
         self.drawing = kwargs.get('drawing', Template.DEFAULT_DRAWING)
         self.color = kwargs.get('color', None)
         self.default_color = kwargs.get('default_color', None)
@@ -63,8 +66,7 @@ class Template:
         self.HEIGHT = self.PAD_TOP + 1 + self.PAD_BOTTOM
         # TODO we shouldn't have to compute all of the above on every instance
 
-
-    def draw(self, term, buffer, coords, style: TemplateStyle):
+    def draw(self, term, buffer, coords, style: TemplateStyle, player: Player):
         for y_idx, line in enumerate(self.DRAWING):
             for x_idx, c in enumerate(line):
                 # TODO pass in piece and display different symbol per kind and different color per player
@@ -89,6 +91,7 @@ class Template:
                         # If it's not the center of the tile, just ignore if if it's over the edge of the board
                         # but only within an allowance
                         continue
+
                     is_label = c == 'c'
                     if is_label:
                         c = self.CENTER_CHAR
@@ -96,9 +99,17 @@ class Template:
                     is_bottom_edge = c == 'i'
                     is_filling = c == '.'
 
+                    if player == Player.Player1:
+                        player_color = term.lightgoldenrodyellow
+                    else:
+                        # player_color = term.antiquewhite4
+                        player_color = term.black
 
                     if style == TemplateStyle.Plain:
-                        color = self.default_color
+                        if is_label:
+                            color = player_color
+                        else:
+                            color = self.default_color
                         if is_bottom_edge:
                             c = '_'
                         if is_filling:
@@ -110,7 +121,7 @@ class Template:
 
                             color = term.bold_lawngreen
                         else:
-                            color = self.default_color
+                            color = player_color
                         if is_bottom_edge:
                             c = '_'
                         if is_filling:
@@ -123,10 +134,8 @@ class Template:
                         if not is_label:
                             color = term.bold_lawngreen
                         else:
-                            color =  self.default_color
+                            color = player_color
                         buffer[y][x] = color + c + term.normal
-                        
-                            
 
                     # https://fsymbols.com/images/ascii.png
                     # RESUME fix this logic, also initialize template.from_type correctly
@@ -145,27 +154,25 @@ class Template:
                     #         buffer[y][x] = color + c + term.normal
                     #     else:
                     #         buffer[y][x] = c
-                        
-                        
 
     @classmethod
-    def from_type(cls, piece_type: PieceType, term: Terminal, **overrides: Dict[str,any]) -> None:
+    def from_type(cls, piece_type: PieceType, term: Terminal, **overrides: Dict[str, any]) -> None:
         match piece_type:
             case PieceType.Queen:
-                return Template(label='q', piece_type=PieceType.Queen, default_color=term.khaki1,**overrides)
+                return Template(label='q', piece_type=PieceType.Queen, default_color=term.khaki1, **overrides)
             case PieceType.Ant:
-                return Template(label='a', piece_type=PieceType.Ant, default_color=term.firebrick,**overrides)
+                return Template(label='a', piece_type=PieceType.Ant, default_color=term.firebrick, **overrides)
             case PieceType.Beetle:
-                return Template(label='b', piece_type = PieceType.Beetle, default_color=term.aqua, **overrides)
+                return Template(label='b', piece_type=PieceType.Beetle, default_color=term.aqua, **overrides)
             case PieceType.Spider:
                 return Template(label='s', piece_type=PieceType.Spider, default_color=term.purple, **overrides)
             case PieceType.Grasshopper:
-                return Template(label='g', piece_type = PieceType.Grasshopper, default_color=term.webgreen, **overrides)
+                return Template(label='g', piece_type=PieceType.Grasshopper, default_color=term.webgreen, **overrides)
             case PieceType.NoPiece:
-                return Template(label=' ', piece_type = PieceType.NoPiece, default_color=term.white, **overrides)
+                return Template(label=' ', piece_type=PieceType.NoPiece, default_color=term.white, **overrides)
             case _:
                 assert False
-        
+
 
 _ = Template(label='q', piece_type=PieceType.Queen)
 Template.WIDTH = _.WIDTH

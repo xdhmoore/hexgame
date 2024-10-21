@@ -8,9 +8,10 @@ class Piece:
 
     # TODO use kwargs so that pos is optional instead of requireing
     # None
-    def __init__(self, pos: Position, type: PieceType):
+    def __init__(self, pos: Position, type: PieceType, player: Player):
         self.pos = pos
         self.type = type
+        self.player = player
 
     # Use board.place or move instead
     def _move(self, dest: Position) -> None:
