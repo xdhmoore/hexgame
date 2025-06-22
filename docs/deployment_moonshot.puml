@@ -1,0 +1,51 @@
+@startuml
+
+' https://plantuml.com/guide
+
+/'
+## Languages I'd like to use:
+* python for machine learning
+* kotlin for web service
+* typescript for browser
+* go?
+* raku?
+* C++?
+* rust?
+* lua?
+* some version of lisp?
+
+
+* ink framework - typescript react in terminal
+'/
+
+node docker {
+
+   node game [
+      game engine
+      (kotlin)
+   ]
+   node terminal [
+      terminal front end
+      (typescript w/ ink)
+   ]
+   ' node bff [
+   '    BFF
+   ' ]
+   node browser [
+      browser front end
+      (typescript)
+   ]
+
+   node reinforcement [
+      reinforcement training/agent
+      (python)
+   ]
+
+   reinforcement --> game
+   ' bff --> game
+   ' browser --> bff
+   browser --> game
+   terminal --> game
+
+}
+@enduml

@@ -6,3 +6,4 @@ class TemplateStyle(Enum):
     Hover = 2
     Selected = 3
     Targetted = 4
+    Debug = 5

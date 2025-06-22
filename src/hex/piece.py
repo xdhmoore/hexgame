@@ -1,6 +1,9 @@
 from typing import List
 
+from sortedcontainers import SortedDict
+
 from hex.piece_type import PieceType
+from hex.player import Player
 from hex.position import Position
 
 
@@ -13,9 +16,17 @@ class Piece:
         self.type = type
         self.player = player
 
+    # TODO overload for Beetles and others that can move on top
     # Use board.place or move instead
-    def _move(self, dest: Position) -> None:
+    # _move or move how to name?
+    def _move(self, pieces: SortedDict, dest: Position) -> bool:
+        if (pieces.get(dest)):
+            return False
+        if (pieces.get(self.pos)):
+            pieces.pop(self.pos)
+        pieces[dest] = self
         self.pos = dest
+        return True
 
         # if not self.is_move_valid(board, dest):
         #     raise ValueError

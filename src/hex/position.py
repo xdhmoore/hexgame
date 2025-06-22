@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, List, Self
+from typing import Any, ClassVar, List, Self
 
 
 # TODO refactor to HexPosition or HEWhateverPosition
@@ -10,6 +10,8 @@ class Position:
     x: int  # row
     y: int  # column
 # RESUME find all usages and refactor to new coordinates
+# TODO should be class level?
+    START: ClassVar[Self]
 
     def __init__(self, *args, **kwargs):
         if len(args) == 1:
@@ -30,7 +32,7 @@ class Position:
     # TODO move this stuff into the board class?
     # https://en.wikipedia.org/wiki/Hexagonal_Efficient_Coordinate_System#/media/File:HECS_Nearest_Neighbors.png
 
-    def get_adjacent_positions(self) -> List[Self]:
+    def get_adjacent_positions(self) -> list[Self]:
         return [
             self._top(),
             self._top_right(),
@@ -45,33 +47,33 @@ class Position:
 
     def _top_right(self) -> Self:
         if self.a == 0:
-            return Position(1 - self.a, self.x + 1, self.y)
+            return self.__class__(1 - self.a, self.x + 1, self.y)
         else:
-            return Position(1 - self.a, self.x + 1, self.y - 1)
+            return self.__class__(1 - self.a, self.x + 1, self.y - 1)
 
     def _bottom_right(self) -> Self:
         if self.a == 0:
-            return Position(1 - self.a, self.x + 1, self.y + 1)
+            return self.__class__(1 - self.a, self.x + 1, self.y + 1)
         else:
-            return Position(1 - self.a, self.x + 1, self.y)
+            return self.__class__(1 - self.a, self.x + 1, self.y)
 
     def _bottom(self) -> Self:
-        return Position(self.a, self.x, self.y + 1)
+        return self.__class__(self.a, self.x, self.y + 1)
 
     def _bottom_left(self) -> Self:
         if self.a == 0:
-            return Position(1 - self.a, self.x - 1, self.y + 1)
+            return self.__class__(1 - self.a, self.x - 1, self.y + 1)
         else:
-            return Position(1 - self.a, self.x - 1, self.y)
+            return self.__class__(1 - self.a, self.x - 1, self.y)
 
     def _top_left(self) -> Self:
         if (self.a == 0):
-            return Position(1 - self.a, self.x - 1, self.y)
+            return self.__class__(1 - self.a, self.x - 1, self.y)
         else:
-            return Position(1 - self.a, self.x - 1, self.y - 1)
+            return self.__class__(1 - self.a, self.x - 1, self.y - 1)
 
     def _top(self) -> Self:
-        return Position(self.a, self.x, self.y - 1)
+        return self.__class__(self.a, self.x, self.y - 1)
 
     def __str__(self):
         return f"({self.a},{self.x},{self.y})"
@@ -82,6 +84,22 @@ class Position:
     @property
     def axy(self):
         return (self.a, self.x, self.y)
+
+    def _get_cmp_key(self):
+        return (self.y, self.a, self.x)
+
+    def __lt__(self, other: Self) -> bool:
+        return self._get_cmp_key() < other._get_cmp_key()
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
+        return self._get_cmp_key() == other._get_cmp_key()
+
+    # @property
+    # def r(self):
+    # should thsi be x or y?
+        # return self.x
 
 
 Position.START = Position(0, 0, 0)

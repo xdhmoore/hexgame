@@ -1,20 +1,37 @@
+import logging
 import pytest
 from hex.cli.screen_position import ScreenPos
 from hex.position import Position
 
-screen_with_hex = [
-    ((0,0,0),   (0,0)),
-    ((0,0,-1),  (0,-2)),
-    ((1,1,0),   (4,-1)),
-    ((1,1,1),   (4,1)),
-    ((0,0,1),   (0,2)),
-    ((1,-1, 1), (-4,1)),
-    ((1,-1,0,), (-4,-1)),
-    ((0,0,1),   (0,2)),
-    ((0,2,0), (8,0)),
-    ((0,2,-1), (8, -2)),
-]
+# TODO use this pattern everywhere
+LOGGER = logging.getLogger(__name__)
 
+screen_with_hex = [
+
+# TODO double check why these didn't work
+#     ((0,0,0),   (0,0)),
+#     ((0,0,-1),  (0,-2)),
+#     ((1,1,0),   (4,-1)),
+#     ((1,1,1),   (4,1)),
+#     ((0,0,1),   (0,2)),
+#     ((1,-1, 1), (-4,1)),
+#     ((1,-1,0), (-4,-1)),
+#     ((0,0,1),   (0,2)),
+#     ((0,2,0), (8,0)),
+#     ((0,2,-1), (8, -2)),
+# ]
+
+    ((0, 0, 0) ,(0, 0)) ,
+    ((0, 0, -1),(0, -2)),
+    ((1, 1, 0) ,(12, 1)),
+    ((1, 1, 1) ,(12, 3)), 
+    ((0, 0, 1) ,(0, 2) ), 
+    ((1, -1, 1),(-4, 3)),
+    ((1, -1, 0),(-4, 1)), 
+    ((0, 0, 1) ,(0, 2) ),
+    ((0, 2, 0) ,(16, 0)),
+    ((0, 2, -1),(16, -2)),
+]
 
 class TestScreenPosition:
 
@@ -24,3 +41,5 @@ class TestScreenPosition:
         screen_pos = ScreenPos(*hex_coord)
         # See note above
         assert screen_coord == screen_pos.xy
+
+    # TODO test order of drawing

@@ -2,8 +2,33 @@
 
 todos:
   - code:
-    - [ ] make screencell move when arrow keys are pressed
-      - [ ] alter screencell to map input arrow keys to correct hex-space direction
+    - [ ] make demo grid center hive center on screen center
+      - [ ] RESUME - demo_grid.py
+        - [ ] unit tests for the following
+        - [x] hive wraparound when hits bottom of screen
+        - [ ] holding wasd down and then letting go causes delayed buildup of motion
+          - [ ] read up on reactive rxpy
+          - [ ] reimplement a stateful keyhandler:
+            url: https://rxpy.readthedocs.io/en/latest/index.html
+    -[ ] make more colorful based on pieces and layers
+    -[ ] make piece bank menus display full names?
+    -[ ] add limits to how far you can move the board
+    -[ ] key to snap back the board to center
+    -[ ] vi keybindings
+
+        - [ ] make horiz movement x2?
+        - [ ] prevent movement from flowing over edge of board and failing
+        - [ ] at start hive should be centered, try several term sizes
+        - [ ] quick add todo items within vs consider
+        - [ ] handle diagnonal left + up held down
+        - [ ] make some automated tests that send keyboard inputs
+        - [ ] use alt terminal's alt keyboard buffer
+    - [ ] consider web frameworks:
+      - [ ] fastapi
+      - [ ] pyramid
+      - [ ] https://falconframework.org/
+      - [ ] numpy
+      - [ ]  rxpy
   - dev environment:
     - [ ] something's wack with git status keep sshowing perm changes
     - [ ] something's wack with git status keep showing file whitespace changes
@@ -22,6 +47,9 @@ todos:
       - [ ] isort?
       - [ ] intellicode?
       - [ ] intellicode api usage examples?
+    - [ ] integrate pylance or mypy or other type checkers
+    - [ ] pyflake?
+    - [ ] remove unused imports / organize
 
 someday maybe:
   - make a kubernetes cluster for everything

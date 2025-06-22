@@ -1,11 +1,16 @@
+import logging
 import re
-from typing import Dict
+from typing import Dict, Self
 
+import blessed
 from blessed import Terminal
 
 from hex.cli.templates.template_style import TemplateStyle
 from hex.piece_type import PieceType
 from hex.player import Player
+
+global_term = blessed.Terminal()
+DEFAULT_COLOR = global_term.white
 
 
 class Template:
@@ -15,15 +20,18 @@ class Template:
     # c is replaced by label
     DEFAULT_DRAWING = r"""
          ___
-        /.c.\
-        \iii/
+        /.t.\
+        \lmr/
     """
+
+    WIDTH: int
+    HEIGHT: int
 
     def __init__(self, **kwargs):
         self.options = kwargs
         self.drawing = kwargs.get('drawing', Template.DEFAULT_DRAWING)
         self.color = kwargs.get('color', None)
-        self.default_color = kwargs.get('default_color', None)
+        self.default_color = kwargs.get('default_color', DEFAULT_COLOR)
         self.bold_label = kwargs.get('bold_label', False)
         self.bold_lines = kwargs.get('bold_lines', False)
         self.label = kwargs.get('label', 'a')
@@ -45,7 +53,7 @@ class Template:
         # TODO don't compile regex every time
         shortest_indent = min(
             map(
-                lambda match: len(match.group()),
+                lambda match: 0 if match is None else len(match.group()),
                 [re.compile(r"^\s*").match(line) for line in cleaned_lines],
             )
         )
@@ -54,7 +62,7 @@ class Template:
         # remove whitespace from any line on the right side
         # find coord of c
         for y_idx, line in enumerate(self.DRAWING):
-            c_x = line.find("c")
+            c_x = line.find("t")
             if c_x != -1:
                 self.CENTER = (y_idx, c_x)
                 break
@@ -64,9 +72,10 @@ class Template:
         self.PAD_BOTTOM = num_lines - self.CENTER[0] - 1
         self.WIDTH = self.PAD_LEFT + 1 + self.PAD_RIGHT
         self.HEIGHT = self.PAD_TOP + 1 + self.PAD_BOTTOM
+
         # TODO we shouldn't have to compute all of the above on every instance
 
-    def draw(self, term, buffer, coords, style: TemplateStyle, player: Player):
+    def draw(self, term, buffer, coords, debug_context, style: TemplateStyle, player: Player):
         for y_idx, line in enumerate(self.DRAWING):
             for x_idx, c in enumerate(line):
                 # TODO pass in piece and display different symbol per kind and different color per player
@@ -76,36 +85,28 @@ class Template:
                     y = y_idx - self.PAD_TOP + coords[0]
                     x = x_idx - self.PAD_LEFT + coords[1]
 
-                    # TODO chagne to handle 3 cases:
-                    # - when inside - draw
-                    # - when just over - ignore
-                    # - when way over - fail
-                    OVERFLOW_ALLOWANCE_X = self.WIDTH * 2
-                    OVERFLOW_ALLOWANCE_Y = self.HEIGHT * 2
-                    if (
-                        (y >= len(buffer) + OVERFLOW_ALLOWANCE_Y)
-                        or (x >= len(buffer[y]) + OVERFLOW_ALLOWANCE_X)
-                        or y <= -OVERFLOW_ALLOWANCE_Y
-                        or x <= -OVERFLOW_ALLOWANCE_X
-                    ):
-                        # If it's not the center of the tile, just ignore if if it's over the edge of the board
-                        # but only within an allowance
+                    if y >= len(buffer) \
+                            or x >= len(buffer[y]) \
+                            or y < 0 \
+                            or x < 0:
                         continue
-
-                    is_label = c == 'c'
+                    # TODO make all user colors in declarative config theme section
+                    # try to make a gruvbox
+                    is_label = c == 't'
                     if is_label:
                         c = self.CENTER_CHAR
 
-                    is_bottom_edge = c == 'i'
+                    # TODO put r on top, c on bottom, and color based on 'a' so that theres more room for r and c
+                    is_bottom_edge = c in ['l', 'm', 'r']
                     is_filling = c == '.'
 
                     if player == Player.Player1:
-                        player_color = term.lightgoldenrodyellow
+                        player_color = term.bold_blue
                     else:
                         # player_color = term.antiquewhite4
-                        player_color = term.black
+                        player_color = term.bold_orange
 
-                    if style == TemplateStyle.Plain:
+                    if style in [TemplateStyle.Plain]:
                         if is_label:
                             color = player_color
                         else:
@@ -134,7 +135,29 @@ class Template:
                         if not is_label:
                             color = term.bold_lawngreen
                         else:
+                            color = player_color + term.on_lawngreen
+                        buffer[y][x] = color + c + term.normal
+
+                    if debug_context and style == TemplateStyle.Debug:
+                        if is_label:
                             color = player_color
+                        else:
+                            color = self.default_color
+
+                        if is_label:
+                            # logging.debug(f'debug_context:{debug_context}')
+                            # logging.debug(
+                                # f'debug_context.hex_pos:{debug_context["hex_pos"]}')
+                            c = str(debug_context["hex_pos"].a)
+                        elif c == 'l':
+                            # I can only display single digit values
+                            c = str(debug_context["hex_pos"].x % 10)
+                        elif c == 'r':
+                            c = str(debug_context["hex_pos"].y % 10)
+                        elif c == 'm':
+                            c = '_'
+                        elif is_filling:
+                            c = ' '
                         buffer[y][x] = color + c + term.normal
 
                     # https://fsymbols.com/images/ascii.png
@@ -155,21 +178,24 @@ class Template:
                     #     else:
                     #         buffer[y][x] = c
 
+    # TODO make this generic like
+    # return cls(label='q', piece_type=self.piece_type default_color=term.khaki1, **overrides)
+    # maybe with a separate config struct mapping piece type to lable, default color, etc.
     @classmethod
-    def from_type(cls, piece_type: PieceType, term: Terminal, **overrides: Dict[str, any]) -> None:
+    def from_type(cls, piece_type: PieceType, term: Terminal, **overrides) -> Self:
         match piece_type:
             case PieceType.Queen:
-                return Template(label='q', piece_type=PieceType.Queen, default_color=term.khaki1, **overrides)
+                return cls(label='q', piece_type=PieceType.Queen, default_color=term.khaki1, **overrides)
             case PieceType.Ant:
-                return Template(label='a', piece_type=PieceType.Ant, default_color=term.firebrick, **overrides)
+                return cls(label='a', piece_type=PieceType.Ant, default_color=term.firebrick, **overrides)
             case PieceType.Beetle:
-                return Template(label='b', piece_type=PieceType.Beetle, default_color=term.aqua, **overrides)
+                return cls(label='b', piece_type=PieceType.Beetle, default_color=term.aqua, **overrides)
             case PieceType.Spider:
-                return Template(label='s', piece_type=PieceType.Spider, default_color=term.purple, **overrides)
+                return cls(label='s', piece_type=PieceType.Spider, default_color=term.purple, **overrides)
             case PieceType.Grasshopper:
-                return Template(label='g', piece_type=PieceType.Grasshopper, default_color=term.webgreen, **overrides)
+                return cls(label='g', piece_type=PieceType.Grasshopper, default_color=term.webgreen, **overrides)
             case PieceType.NoPiece:
-                return Template(label=' ', piece_type=PieceType.NoPiece, default_color=term.white, **overrides)
+                return cls(label=' ', piece_type=PieceType.NoPiece, default_color=term.white, **overrides)
             case _:
                 assert False
 

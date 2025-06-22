@@ -1,7 +1,10 @@
 from dataclasses import dataclass
+
+from hex.cli.templates.template import Template
 from hex.position import Position
 
 
+# TODO change to ScreenPosition for consistency
 @dataclass
 class ScreenPos:
     """
@@ -23,22 +26,30 @@ class ScreenPos:
         ScreenPos(a, r, c)
         ScreenPos(y, x)
         """
-        hex_pos = None
+        hex_pos: Position | None = None
 
         if len(args) == 1 and len(kwargs.keys()) == 0:
-            hex_pos: Position = args[0]
+            hex_pos = args[0]
 
         if len(args) == 3 and len(kwargs.keys()) == 0:
             hex_pos = Position(*args[0:3])
 
         if hex_pos is not None:
             if (hex_pos.a == 0):
-                self.x = 4 * hex_pos.x
+                self.x = 8 * hex_pos.x
                 self.y = 2 * hex_pos.y
             else:
-                self.x = 4 * hex_pos.x
-                self.y = 2 * hex_pos.y - 1
+                self.x = 8 * hex_pos.x + (Template.WIDTH - 1)
+                self.y = 2 * hex_pos.y + 1 # (Template.HEIGHT)
             return
+            # I don't think this is right, but just in case:
+            # if (hex_pos.a == 0):
+            #     self.x = 4 * hex_pos.x
+            #     self.y = 2 * hex_pos.y
+            # else:
+            #     self.x = 4 * hex_pos.x
+            #     self.y = 2 * hex_pos.y - 1
+            # return
 
         if len(args) == 2 and len(kwargs.keys()) == 0:
             self.y = args[0]
@@ -48,9 +59,9 @@ class ScreenPos:
         raise ValueError("Invalid argument")
 
     @property
-    def yx(self) -> tuple[2]:
+    def yx(self) -> tuple[int, int]:
         return (self.y, self.x)
 
     @property
-    def xy(self) -> tuple[2]:
+    def xy(self) -> tuple[int, int]:
         return (self.x, self.y)
