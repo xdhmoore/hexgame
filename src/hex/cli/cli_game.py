@@ -87,23 +87,6 @@ class CliGame:
                 generate_place_pieces(board)
                 # TODO also, commit per day
 
-                # first = True
-                # while True:
-                #     inkeys = []
-                #     if (first):
-                #         process_and_display(term, mgr, [], True)
-                #         first = False
-                #         continue
-
-                #     has_input = term.kbhit(0.2)
-                #     while has_input:
-                #         next_inch: str = term.getch()
-                #         if next_inch:
-                #             inkeys = inkeys + [next_inch]
-                #             has_input = term.kbhit(0)
-                #         else:
-                #             has_input = False
-                # process_and_display(term, mgr, inkeys, first)
                 val = term.inkey(0.1)
                 process_and_display(term, mgr, val, force=True)
                 while not val is None and val != "q":
