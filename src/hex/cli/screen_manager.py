@@ -108,9 +108,11 @@ class PlacePieceGameState(AbstractGameState):
 
     def on_key(self, ks, mgr) -> tuple[AbstractGameState | None, bool]:
         next_state = None
+        actions_taken = False
         if mgr.selector == None:
             # TODO words in errors
-            raise RuntimeError()
+            #raise RuntimeError()
+            pass
         elif mgr.selector.piece == None:
             # TODO when you're placing but the selector isn't over a real place
 
@@ -131,7 +133,7 @@ class PickPieceGameState(AbstractGameState):
     def gs_type(self):
         return GameStateType.PICK_PIECE
 
-    def __init__(self, term, board):
+    def __init__(self, term: Terminal, board: Board):
         self.term = term
         self.board = board
 
@@ -139,7 +141,7 @@ class PickPieceGameState(AbstractGameState):
         next_state = None
         actions_taken = False
         if (ks.code == self.term.KEY_LEFT):
-            logging.debug('in branch')
+            # logging.debug('in branch')
             mgr.player_display_state_map[self.board.curr_player].piece_bank_mgr.select_prev_piece(
             )
             actions_taken = True
@@ -150,21 +152,28 @@ class PickPieceGameState(AbstractGameState):
             actions_taken = True
 
         elif (ks.code == self.term.ENTER or ks.code == self.term.KEY_ENTER):
-            next_state = PlacePieceGameState(self.term, self.board)
+
+            if (self.board.step > 0):
+                next_state = PlacePieceGameState(self.term, self.board)
+
             current_piece_type = mgr.player_display_state_map[
                 self.board.curr_player].piece_bank_mgr.current_piece
             # TODO  these should come from the board's suggestion as the next available position
             piece = Piece(Position(0, 0, 0),
-                          current_piece_type, self.board.curr_player)
-            pos: Position = self.board.get_recommended_pos()
-            # TODO fail if not valid move
-            self.board.virtual_move(piece, pos)
-            mgr.selector = SelectorCell(
-                style=TemplateStyle.Selected,
-                pos=pos,
-                board=self.board,
-                term=self.term,
-            )
+                          current_piece_type, self.board.get_curr_player())
+            start_positions, use_virtual_move = self.board.get_destinations(piece.type, None)
+
+            if use_virtual_move:
+                # TODO fail if not valid move
+                self.board.virtual_move(piece, start_positions[0])
+                mgr.selector = SelectorCell(
+                    style=TemplateStyle.Selected,
+                    pos=start_positions[0],
+                    board=self.board,
+                    term=self.term,
+                )
+            else:
+                self.board.move(piece, start_positions[0], self.board.get_curr_player())
             actions_taken = True
 
         return super().on_key_shared(ks, mgr, next_state, actions_taken)
@@ -188,22 +197,23 @@ class ScreenManager:
 
         self.view_offset: tuple[int, int] = (0, 0)
 
-        if len(board.pieces):
+        # logging.debug(self.board.map.occupied_positions())
+        if len(self.board.map.occupied_positions()) > 0:
 
             min_x = math.inf
             max_x = - math.inf
             min_y = math.inf
             max_y = - math.inf
 
-            for pos in [ScreenPos(p) for p in board.pieces]:
+            for pos in [ScreenPos(p) for p in self.board.map.occupied_positions()]:
                 min_x = min(min_x, pos.x)
                 min_y = min(min_y, pos.y)
                 max_x = max(max_x, pos.x)
                 max_y = max(max_y, pos.y)
 
             self.view_offset: tuple[int, int] = (
-                math.floor((min_y + max_y) / 2),
-                math.floor((min_x + max_x) / 2),
+                - math.floor((min_y + max_y) / 2),
+                - math.floor((min_x + max_x) / 2),
             )
 
         self.player_display_state_map: dict[Player,
@@ -225,15 +235,14 @@ class ScreenManager:
 
     @property
     def cells(self):
-        return [ScreenCell(self.term, (TemplateStyle.Debug if self.debug else TemplateStyle.Plain),  piece)
-                for piece in self.board.pieces.values()]
+        return [ScreenCell(self.term, (TemplateStyle.Debug if self.debug else TemplateStyle.Plain),  node.piece)  for node in self.board.map.mapmap.values()]
 
     # TODO hwo to do javadocs for methods, cclasses, etc
     # returns whether any action was taken that might need a redraw
     def onkey(self, key: Keystroke):
         actions_taken = False
-        logging.debug(self.state)
-        (next_state, actions_taken) = self.state.on_key(key, self)
+        # logging.debug(self.state)
+        next_state, actions_taken = self.state.on_key(key, self)
         if (next_state):
             self.state = next_state
 
@@ -286,6 +295,7 @@ class ScreenManager:
         for screen_cell in reversed(screen_cells):
             if self.slow_display:
                 time.sleep(0.2)
+            # logging.debug(f"viewport_offset:${self.get_viewport_offset()}")
             screen_cell.draw(term=self.term,
                              buffer=self.display_buff,
                              player=Player.Player1,  # TODO update when turns implemented
@@ -296,14 +306,18 @@ class ScreenManager:
     # TODO right now this functions as the viewport but at some point will want to make the viewport moveable
     def get_viewport_offset(self) -> tuple[int, int]:
         screen_center = self.get_screen_center()
+        # logging.debug(f"screen center: ${screen_center}")
+        # logging.debug(f"view offset: ${self.view_offset}")
+
         return (
             screen_center[0] + self.view_offset[0],
-            screen_center[0] + self.view_offset[1]
+            screen_center[1] + self.view_offset[1]
         )
 
     # TODO change this to offset within player areas
     def get_screen_center(self) -> tuple[int, int]:
-        return ((self.term.height - 1) // 2, (self.term.width - 1) // 2)
+        # logging.debug(f"height:${self.term.height}, width:${self.term.width}")
+        return ((self.term.height) // 2, (self.term.width) // 2)
 
     def init_selector(self) -> None:
         self.selector = SelectorCell(

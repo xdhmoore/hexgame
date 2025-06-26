@@ -5,10 +5,12 @@ from typing import Callable, Dict, List, Tuple
 
 from sortedcontainers import SortedDict
 
+from hex.map import Map
 from hex.piece import Piece
 from hex.piece_bank import PieceBank
 from hex.player import Player
 from hex.position import Position
+from hex.piece_type import PieceType
 
 
 @dataclass
@@ -16,6 +18,8 @@ class PlayerState:
     piece_bank: PieceBank
 
 # TODO save state in numpy array?
+
+
 
 
 class Board:
@@ -28,7 +32,7 @@ class Board:
     def __init__(self) -> None:
         # TODO might be interesting to implement this with a small graph db like cogdb
         # TODO - make this a map from hex location to piece
-        self.pieces  = SortedDict()
+        #self.pieces = SortedDict()
         self.virtual_pieces = dict()
         # self.placements = dict()
         self.edgeHead = None
@@ -38,6 +42,7 @@ class Board:
         self.player_state_map[Player.Player1] = PlayerState(PieceBank())
         self.player_state_map[Player.Player2] = PlayerState(PieceBank())
         self.curr_player = Player.Player1
+        self.map = Map()
 
     def get_piece_bank(self, player) -> PieceBank:
         return self.player_state_map[player].piece_bank
@@ -45,26 +50,44 @@ class Board:
     def get_curr_player(self):
         return self.curr_player
 
-    def get_empty_pos(self) -> Position:
-        edges = self.get_board_edges()
-        if len(edges) < 1:
-            # TODO msg
-            raise RuntimeError()
-        # TODO is this good enough? Return random edge node? Maybe return closest edge node to center?
-        return edges[0]
+    # def get_empty_pos(self) -> Position:
+    #     edges = self.get_board_edges()
+    #     if len(edges) < 1:
+    #         # TODO msg
+    #         raise RuntimeError()
+    #     # TODO is this good enough? Return random edge node? Maybe return closest edge node to center?
+    #     return edges[0]
 
-    def get_board_edges(self) -> list[Position]:
-        return [
-            pos
-            for piece in self.pieces.values()
-            for pos in piece.pos.get_adjacent_positions()
-            if not self.is_occupied(pos)
-            # handle "cannot slide into" issue
-            if len(piece.get_adjacent_pieces()) < 5
-        ]
+    # def get_board_edges(self) -> list[Position]:
+        # return [
+        #     pos
+        #     for piece in self.pieces.values()
+        #     for pos in piece.pos.get_adjacent_positions()
+        #     if not self.is_occupied(pos)
+        #     # handle "cannot slide into" issue
+        #     if len(piece.get_adjacent_pieces()) < 5
+        # ]
 
-    def get_recommended_pos(self) -> Position:
-        return self.get_empty_pos()
+    def get_destinations(self, piece_type: PieceType, start_pos: Position | None) -> tuple[list[Position], bool]:
+        # https://www.boardspace.net/english/about_hive_notation.html
+        # Do a depth-first-search for the wall from each of the adjacent tiles
+        if (self.step == 0):
+            return ([Position(0, 0, 0)], False)
+
+        player = self.get_curr_player()
+
+
+        if (start_pos is None):
+            return (self.map.get_playable_edges(), True)
+
+        # TODO
+        # assert (player, piece_type) == self.at(start_pos)
+
+        # RESUME - do this by first setting up the map
+        # return piece_type.get_destinations(self.board, player, piece_type, start_pos)
+        # TODO remove
+        return ([Position(0, 0, 0),], False)
+
 
     def filter_blocked_piees(self, pieces) -> list[Piece]:
         return [p for p in pieces if self._piece_reachable(p)]
@@ -116,19 +139,20 @@ class Board:
 
     # It may be possible to maintain a data structure of this cluster info that updates as the game is played.
 
-    def calc_board_boundaries(self):
-        # RESUME
-        # TODO will this work with hex coords?
-        # TODO take advantage of pieces sorteddict ordering to get max/min of at least y coord
-        return reduce(lambda a, b: min(a.pos.r, b.pos.r), self.pieces)
-    
+    # def calc_board_boundaries(self):
+    #     # RESUME
+    #     # TODO will this work with hex coords?
+    #     # TODO take advantage of pieces sorteddict ordering to get max/min of at least y coord
+    #     return reduce(lambda a, b: min(a.pos.r, b.pos.r), self.pieces)
 
     def clear_virtual_pieces(self) -> None:
         self.virtual_pieces = dict()
 
+# TODO rename to preview_move
     def virtual_move(self, piece: Piece, pos: Position) -> bool:
         # self.pieces_by_pos[piece.pos] = None
-        if not piece._move(self.pieces, pos):
+        # if not piece._move(self.map, pos):
+        if self.map.occupied(pos):
             return False
 
         self.virtual_pieces[id(piece)] = piece
@@ -137,9 +161,9 @@ class Board:
         return True
 
     # TODO change callers to handle when this returns false
-    def move(self, piece: Piece, pos: Position) -> bool:
+    def move(self, piece: Piece, pos: Position, player) -> bool:
         # self.pieces_by_pos[piece.pos] = None
-        if not piece._move(self.pieces, pos):
+        if not piece._move(self.map, pos, player):
             return False
 
         self.curr_player = self.curr_player.next()
@@ -149,25 +173,22 @@ class Board:
 
         return True
 
-    def take_step(self):
-        self.step += 1
-
     # def at(self, pos:Position) -> Position:
     #     return self.placements[pos]
 
-    def is_occupied(self, pos: Position):
-        # return len([filter(self.pieces.values if piece.pos.arc == pos.arc]) > 0
-        # return any(piece for piece in self.pieces.values if piece.pos.arc == pos.arc)
-        matches_position: Callable[[Piece],
-                                   bool] = lambda piece: piece.pos.axy == pos.axy
-        # TODO this shouldn't be necessary with new SortedDict
-        return (
-            len(
-                list(
-                    filter(matches_position, self.pieces.values())
-                )
-            )
-            > 0
-        )
+    # def is_occupied(self, pos: Position):
+    #     # return len([filter(self.pieces.values if piece.pos.arc == pos.arc]) > 0
+    #     # return any(piece for piece in self.pieces.values if piece.pos.arc == pos.arc)
+    #     matches_position: Callable[[Piece],
+    #                                bool] = lambda piece: piece.pos.axy == pos.axy
+    #     # TODO this shouldn't be necessary with new SortedDict
+    #     return (
+    #         len(
+    #             list(
+    #                 filter(matches_position, self.pieces.values())
+    #             )
+    #         )
+    #         > 0
+    #     )
 
-    # def get_edge_positions(self):
+    # # def get_edge_positions(self):

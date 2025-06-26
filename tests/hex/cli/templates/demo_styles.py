@@ -1,7 +1,7 @@
 
 
 from math import ceil
-from typing import List
+from typing import List, Optional
 import blessed
 from hex.cli.templates.template import Template
 from hex.cli.templates.template_style import TemplateStyle
@@ -11,7 +11,7 @@ from hex.player import Player
 
 def flush_buffer(term, display_buff):
     out: str = "" #term.clear + term.home
-    c: str = None
+    c: str | None = None
     for y_idx, line in enumerate(display_buff):
         for x_idx, c in enumerate(line):
             if c:

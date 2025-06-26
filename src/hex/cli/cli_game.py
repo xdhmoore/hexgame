@@ -1,5 +1,6 @@
 
 
+import argparse
 import logging
 from dataclasses import dataclass
 from time import sleep
@@ -45,15 +46,15 @@ def term_bounding_box(term: Terminal) -> Box:
     return Box(0, 0, term.width - 1, term.height - 1)
 
 
-def term_to_hex_box(box: Box) -> Box:
-    num_vert: int = (box.max_y - box.min_y) // Template.HEIGHT
-    num_horiz: int = (box.max_x - box.min_x) // Template.WIDTH
-    if (num_vert % 2 == 0):
-        num_above_orig = (num_vert // 2) - 1
-    else:
-        num_above_orig = num_vert // 2
-    # TODO
-    return None
+# def term_to_hex_box(box: Box) -> Box:
+#     num_vert: int = (box.max_y - box.min_y) // Template.HEIGHT
+#     num_horiz: int = (box.max_x - box.min_x) // Template.WIDTH
+#     if (num_vert % 2 == 0):
+#         num_above_orig = (num_vert // 2) - 1
+#     else:
+#         num_above_orig = num_vert // 2
+#     # TODO
+#     return None
 
 
 def generate_place_pieces(board: Board):
@@ -63,14 +64,16 @@ def generate_place_pieces(board: Board):
             for c in range(10):
                 piece = Piece(Position(a, c, r),
                               PieceType.NoPiece, Player.Player1)
-                board.move(piece, Position(a, c, r))
+                
+                # TODO remove duplicated data in both piece and player and position. they might not match
+                board.move(piece, Position(a, c, r), Player.Player1)
 
 
 class CliGame:
 
     # System Seq Diagram : [MermaidChart: 1d3677c8-35c2-4a64-9971-d59d7e11e9bd]
     # Seq Diagram: [MermaidChart: 0cc01e70-aa53-4810-889d-46c95a7dcfb3]
-    def main(self) -> None:
+    def main(self, grid) -> None:
 
         try:
 
@@ -78,14 +81,13 @@ class CliGame:
             with term.fullscreen(), term.cbreak(), term.hidden_cursor():
                 print(term.home + term.clear)
                 board = Board()
+
+                if (grid):
+                    generate_place_pieces(board)
+
                 mgr = ScreenManager(
                     board, term, debug=True, slow_display=False)
 
-                # Calc term box size
-
-                # term_box = term_bounding_box(term)
-                generate_place_pieces(board)
-                # TODO also, commit per day
 
                 val = term.inkey(0.1)
                 process_and_display(term, mgr, val, force=True)
@@ -93,20 +95,12 @@ class CliGame:
                     val = term.inkey(0.1)
                     process_and_display(term, mgr, val)
 
-                    # logging.debug(inkeys)
-                    # TODO limit fps using SDL_delay like pygame tick or other delay function, sleep()?
-                    # https://www.pygame.org/docs/ref/time.html#pygame.time.Clock.tick
-                    # https://github.com/libsdl-org/SDL/blob/aaa5d70efcd48ab0dd6759ac18964333c8c1a95d/src/timer/windows/SDL_systimer.c#L106
-                    # https://github.com/libsdl-org/SDL/blob/aaa5d70efcd48ab0dd6759ac18964333c8c1a95d/src/timer/unix/SDL_systimer.c#L138
-
-                # Loop through hex coords and place a new piece on the board at each
-
-                # alter screen cells so that they print the hex coords
-                # add a key shortcut to switch with screen space coords, before translation
-                # maybe shortcut to show screen space coords after translation too
         except Exception as ex:
-            logging.error(msg=ex)
+            logging.error(ex, exc_info=True)
+
             exit(1)
+
+# TODO make diagnonal board motion work better
 
 
 def process_and_display(term: Terminal, mgr: ScreenManager, ks, force=False) -> None:
@@ -122,4 +116,10 @@ def process_keystrokes(term: Terminal, mgr: ScreenManager, ks) -> bool:
 
 
 if __name__ == "__main__":
-    CliGame().main()
+
+    parser = argparse.ArgumentParser(description="Hex Game")
+    parser.add_argument("--grid", action="store_true", help="Greeting to use")
+
+    args = parser.parse_args()
+
+    CliGame().main(args.grid)

@@ -26,7 +26,7 @@ class PieceBankManager:
         piece_bank = self.board.get_piece_bank(self.player)
         self.selected_idx = (self.selected_idx -
                              1) % len(piece_bank.bank.keys())
-        logging.debug(self.selected_idx)
+        # logging.debug(self.selected_idx)
 
     def select_next_piece(self):
         piece_bank = self.board.get_piece_bank(self.player)

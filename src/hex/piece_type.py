@@ -3,6 +3,10 @@ from enum import Enum, auto, unique
 @unique
 class PieceType(Enum):
 
+    # TODO replace this with StrEnum and
+    # ANT = ("ANT", 3)
+    # __init__(self, name, num)
+
     # Set enum num/value automatically based on new constructor
     # https://stackoverflow.com/a/19300424/356887
     def __new__(cls, *args, **kwds):

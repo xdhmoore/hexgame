@@ -2,6 +2,7 @@ from typing import List
 
 from sortedcontainers import SortedDict
 
+from hex.board import Map
 from hex.piece_type import PieceType
 from hex.player import Player
 from hex.position import Position
@@ -16,20 +17,19 @@ class Piece:
         self.type = type
         self.player = player
 
+
     # TODO overload for Beetles and others that can move on top
     # Use board.place or move instead
     # _move or move how to name?
-    def _move(self, pieces: SortedDict, dest: Position) -> bool:
-        if (pieces.get(dest)):
+    # this is 
+    def _move(self, map: Map, dest: Position, player: Player) -> bool:
+        # TODO handle beetles moving over other tiles
+        if (map.get(*dest.axy)):
             return False
-        if (pieces.get(self.pos)):
-            pieces.pop(self.pos)
-        pieces[dest] = self
-        self.pos = dest
+        
+        map.place(self, dest, player)
         return True
 
-        # if not self.is_move_valid(board, dest):
-        #     raise ValueError
 
     def is_move_valid(self, dest: Position) -> bool:
         # TODO fix

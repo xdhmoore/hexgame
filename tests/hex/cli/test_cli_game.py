@@ -9,8 +9,9 @@ from hex.position import Position
 
 
 class TestCliGame:
-    def extract_positions(self, board: Board):
-        return map(lambda piece: (piece, ScreenPos(piece.pos)), board.pieces.values())
+   pass
+    # def extract_positions(self, board: Board):
+    #     return map(lambda piece: (piece, ScreenPos(piece.pos)), board.pieces.values())
 
 #  TODO this function isn't used yet and I've redone the coords. also should probably use hex coords
     # @pytest.mark.parametrize(

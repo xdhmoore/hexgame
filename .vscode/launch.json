@@ -10,14 +10,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/src/hex/cli/cli_game.py",
       "console": "integratedTerminal"
-    }
-    {
-      "name": "Python Debugger: Demo CLI Grid",
-      "type": "debugpy",
-      "request": "launch",
-      "program": "${workspaceFolder}/tests/hex/cli/demo_grid.py",
-      "console": "integratedTerminal"
-    }
+    },
     {
       "name": "Python Debugger: Demo CLI Styles",
       "type": "debugpy",

@@ -15,6 +15,9 @@ todos:
     -[ ] add limits to how far you can move the board
     -[ ] key to snap back the board to center
     -[ ] vi keybindings
+    -[ ] maybe make a background grey grid of hexagons
+    -[ ] highlight player's bank when it's their term
+    -[ ] abstract out the keys from the desired moves. the board should only know about the moves
 
         - [ ] make horiz movement x2?
         - [ ] prevent movement from flowing over edge of board and failing

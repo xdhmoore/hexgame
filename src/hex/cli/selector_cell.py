@@ -18,7 +18,12 @@ class SelectorCell(ScreenCell):
         self._pos = pos
         self.template = None
 
-        self.piece = board.pieces[self._pos]
+        
+        node = board.map.get(self._pos)
+        self.piece = None
+        if (node is not None):
+            self.piece = node.piece
+
         if (not self.piece is None):
             # // TODO remove duplciated work from move() func
             self.template = Template.from_type(
@@ -58,7 +63,8 @@ class SelectorCell(ScreenCell):
         # TODO does setting this mean I can end up with a mismatched self.piece?
         # Why have a property when I always use _pos?
         self._pos = Position(*new_pos)
-        self.piece = board.pieces[self._pos]
+        #self.piece = board.map.get[self._pos]
+        self.piece = board.map.get_piece(*self._pos.axy)
         # // RESUME create a new Template by setting options and merging them with ant or bee, etc.
         # self.template = Template.from_type(self.piece.type)
         if (not self.piece is None):
