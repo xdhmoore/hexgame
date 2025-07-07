@@ -1,6 +1,7 @@
 import logging
 import re
 from typing import Dict, Self
+from venv import logger
 
 import blessed
 from blessed import Terminal
@@ -145,9 +146,6 @@ class Template:
                             color = self.default_color
 
                         if is_label:
-                            # logging.debug(f'debug_context:{debug_context}')
-                            # logging.debug(
-                                # f'debug_context.hex_pos:{debug_context["hex_pos"]}')
                             c = str(debug_context["hex_pos"].a)
                         elif c == 'l':
                             # I can only display single digit values
@@ -181,22 +179,32 @@ class Template:
     # TODO make this generic like
     # return cls(label='q', piece_type=self.piece_type default_color=term.khaki1, **overrides)
     # maybe with a separate config struct mapping piece type to lable, default color, etc.
+    # TODO parameterize PieceType like PieceType(StrEnum) and add label, color there
     @classmethod
     def from_type(cls, piece_type: PieceType, term: Terminal, **overrides) -> Self:
         match piece_type:
-            case PieceType.Queen:
-                return cls(label='q', piece_type=PieceType.Queen, default_color=term.khaki1, **overrides)
             case PieceType.Ant:
                 return cls(label='a', piece_type=PieceType.Ant, default_color=term.firebrick, **overrides)
             case PieceType.Beetle:
                 return cls(label='b', piece_type=PieceType.Beetle, default_color=term.aqua, **overrides)
-            case PieceType.Spider:
-                return cls(label='s', piece_type=PieceType.Spider, default_color=term.purple, **overrides)
             case PieceType.Grasshopper:
                 return cls(label='g', piece_type=PieceType.Grasshopper, default_color=term.webgreen, **overrides)
+            case PieceType.Queen:
+                return cls(label='q', piece_type=PieceType.Queen, default_color=term.khaki1, **overrides)
+            case PieceType.Spider:
+                return cls(label='s', piece_type=PieceType.Spider, default_color=term.purple, **overrides)
+
+            case PieceType.Ladybug:
+                return cls(label='l', piece_type=PieceType.Ladybug, default_color=term.red, **overrides)
+            case PieceType.Mosquito:
+                return cls(label='m', piece_type=PieceType.Mosquito, default_color=term.webgreen, **overrides)
+            case PieceType.Pillbug:
+                return cls(label='p', piece_type=PieceType.Pillbug, default_color=term.webgreen, **overrides)
+
             case PieceType.NoPiece:
                 return cls(label=' ', piece_type=PieceType.NoPiece, default_color=term.white, **overrides)
             case _:
+                logging.error(f"Unknown piece type: {piece_type}")
                 assert False
 
 

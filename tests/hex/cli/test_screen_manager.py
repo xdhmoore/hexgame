@@ -17,7 +17,7 @@ class TestScreenManager:
     @pytest.mark.parametrize(
         "bounds,center",
         [
-            ((2, 4), (0, 1)),
+            ((2, 4), (1, 2)),
             ((3, 5), (1, 2)),
         ],
     )
@@ -27,6 +27,7 @@ class TestScreenManager:
         term.width = bounds[1]
         board = Mock()
         board.pieces = []
+        board.map.occupied_positions = lambda: []
         mgr = ScreenManager(board, term)
         actual_center = mgr.get_screen_center()
         assert actual_center == center

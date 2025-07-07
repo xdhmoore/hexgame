@@ -17,19 +17,19 @@ class Piece:
         self.type = type
         self.player = player
 
-
     # TODO overload for Beetles and others that can move on top
     # Use board.place or move instead
     # _move or move how to name?
-    # this is 
+    # this is
+    # TODO it would be nice if Piece was immutable and pos was always set in constructor
+
     def _move(self, map: Map, dest: Position, player: Player) -> bool:
         # TODO handle beetles moving over other tiles
         if (map.get(dest)):
             return False
-        
+
         map.place(self, dest, player)
         return True
-
 
     def is_move_valid(self, dest: Position) -> bool:
         # TODO fix

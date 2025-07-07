@@ -56,14 +56,13 @@ class ScreenCell:
         Display a hexagonal tile on the screen, adjusting for the passed in viewport offset
         """
 
-        #logging.debug(f"viewport_offset:{viewport_offset}")
 
         screen_coords = (
             viewport_offset[0] + ScreenPos(self._pos).y,
             viewport_offset[1] + ScreenPos(self._pos).x,
         )
 
-        #logging.debug(f"draw() at {screen_coords}")
+        #(f"draw() at {screen_coords}")
         # RESUME - all draw's should send player
         # also, start back on cli game logic
         self.template.draw(term, buffer, screen_coords, {

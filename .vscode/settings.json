@@ -8,7 +8,7 @@
   "python.analysis.inlayHints.functionReturnTypes": true,
   "python.analysis.inlayHints.pytestParameters": true,
   "python.analysis.inlayHints.variableTypes": true,
-  "python.analysis.typeCheckingMode": "standard",
+  //"python.analysis.typeCheckingMode": "standard",
   "python.analysis.typeEvaluation.deprecateTypingAliases": true,
   "python.analysis.typeEvaluation.disableBytesTypePromotions": true,
   "python.analysis.typeEvaluation.strictDictionaryInference": true,
@@ -22,4 +22,6 @@
   "[python]": {
     "diffEditor.ignoreTrimWhitespace": true
   },
+  "python.languageServer": "Pylance",
+  "python.analysis.autoImportCompletions": true
 }

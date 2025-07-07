@@ -35,12 +35,12 @@ class Board:
         #self.pieces = SortedDict() 
         # self.virtual_pieces = dict()
         # self.placements = dict()
-        self.edgeHead = None
-        self.edgeTail = None
         self.step = 0
         self.player_state_map = dict()
         self.player_state_map[Player.Player1] = PlayerState(PieceBank())
         self.player_state_map[Player.Player2] = PlayerState(PieceBank())
+        # TODO make this into a whole short-hand compatible history object
+        self.history = [];
         self.curr_player = Player.Player1
         self.map = Map()
 
@@ -167,12 +167,18 @@ class Board:
         if not piece._move(self.map, pos, player):
             return False
 
+        self.history += [(self.curr_player, piece, pos)]
         self.curr_player = self.curr_player.next()
         # TODO map to id instead to save space?
         # //self.placements[piece.pos] = piece
         self.step += 1
 
         return True
+    
+    def last_move(self):
+        if len(self.history) == 0: return None
+
+        return self.history[-1]
 
     # def at(self, pos:Position) -> Position:
     #     return self.placements[pos]

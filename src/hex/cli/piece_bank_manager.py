@@ -27,7 +27,6 @@ class PieceBankManager:
         piece_bank = self.board.get_piece_bank(self.player)
         self.selected_idx = (self.selected_idx -
                              1) % len(piece_bank.bank.keys())
-        # logging.debug(self.selected_idx)
 
     def select_next_piece(self):
         piece_bank = self.board.get_piece_bank(self.player)
@@ -37,7 +36,6 @@ class PieceBankManager:
     # TODO assert buffer dimensions or use custom type?
     def draw(self, buffer: list[list]) -> None:
         bank_str = self._build_str()
-        logging.debug(f"bank:{bank_str}")
         # TODO highlight line if it's a player's turn
         row_num = 0 if self.player == Player.Player1 else len(buffer) - 1
         for idx, c in enumerate(bank_str):
@@ -46,7 +44,6 @@ class PieceBankManager:
     # TODO change delete to not yank
 
     def _build_str(self) -> str:
-        # logging.debug("drawing piece bank for player " + self.player.name)
         output = self.player.name + " - "
         piece_bank = self.board.get_piece_bank(self.player)
         first = True

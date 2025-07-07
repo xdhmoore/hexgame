@@ -28,6 +28,7 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
     level=logging.DEBUG,
 )
+# TODO date format for local time
 
 
 @dataclass
@@ -64,12 +65,13 @@ def generate_place_pieces(board: Board):
             for c in range(10):
                 piece = Piece(Position(a, c, r),
                               PieceType.NoPiece, Player.Player1)
-                
+
                 # TODO remove duplicated data in both piece and player and position. they might not match
                 board.move(piece, Position(a, c, r), Player.Player1)
 
 
 class CliGame:
+
 
     # System Seq Diagram : [MermaidChart: 1d3677c8-35c2-4a64-9971-d59d7e11e9bd]
     # Seq Diagram: [MermaidChart: 0cc01e70-aa53-4810-889d-46c95a7dcfb3]
@@ -79,6 +81,7 @@ class CliGame:
 
             term = blessed.Terminal()
             with term.fullscreen(), term.cbreak(), term.hidden_cursor():
+                EMPTY: Keystroke = new_keystroke(term, ucs='')
                 print(term.home + term.clear)
                 board = Board()
 
@@ -88,12 +91,13 @@ class CliGame:
                 mgr = ScreenManager(
                     board, term, debug=True, slow_display=args.slow)
 
-
                 val = term.inkey(0.1)
                 process_and_display(term, mgr, val, force=True)
                 while not val is None and val != "q":
                     val = term.inkey(0.1)
-                    process_and_display(term, mgr, val)
+                    if val != EMPTY:
+                        logging.debug(f"v:{val}")
+                        process_and_display(term, mgr, val)
 
         except Exception as ex:
             logging.error(ex, exc_info=True)
@@ -111,15 +115,17 @@ def process_and_display(term: Terminal, mgr: ScreenManager, ks, force=False) -> 
 
 def process_keystrokes(term: Terminal, mgr: ScreenManager, ks) -> bool:
     actions_taken: bool = False
-    actions_taken = actions_taken or mgr.onkey(ks)
+    actions_taken = actions_taken or mgr.on_key(ks)
     return actions_taken
 
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Hex Game")
-    parser.add_argument("--grid", action="store_true", help="Generate a grid of pieces")
-    parser.add_argument("--slow", action="store_true", help="Slow down the display for debugging purposes")
+    parser.add_argument("--grid", action="store_true",
+                        help="Generate a grid of pieces")
+    parser.add_argument("--slow", action="store_true",
+                        help="Slow down the display for debugging purposes")
 
     args = parser.parse_args()
 

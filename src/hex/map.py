@@ -40,7 +40,6 @@ class Map:
             edges += o.get_adjacent_positions()
 
         # TODO filter out
-        logging.debug(f"{edges}")
         return edges
     
     def occupied(self, pos:Position):

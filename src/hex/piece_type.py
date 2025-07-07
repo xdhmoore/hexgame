@@ -1,5 +1,8 @@
 from enum import Enum, auto, unique
 
+# TODO use StrEnum instead of Enum
+# and set label and color as seen in
+# Template from_type()? maybe those are presentation data though?
 @unique
 class PieceType(Enum):
 

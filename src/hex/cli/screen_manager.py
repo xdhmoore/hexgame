@@ -1,7 +1,6 @@
 
 from __future__ import annotations
 
-import abc
 import logging
 import math
 import time
@@ -19,11 +18,14 @@ from blessed import Terminal
 from blessed.keyboard import Keystroke
 
 from hex.board import Board
+from hex.cli import piece_bank_manager
 from hex.cli.keys import Keys
 from hex.cli.piece_bank_manager import PieceBankManager
 from hex.cli.screen_cell import ScreenCell
 from hex.cli.screen_position import ScreenPos
 from hex.cli.selector_cell import SelectorCell
+from hex.cli.state.abstract import AbstractState, StateType
+from hex.cli.state.pick_piece_type import PickPieceTypeState
 from hex.cli.templates.template import Template
 from hex.cli.templates.template_style import TemplateStyle
 from hex.piece import Piece
@@ -35,187 +37,9 @@ from hex.position import Position
 @dataclass
 class PlayerDisplayState:
     piece_bank_mgr: PieceBankManager
-    selected_piece: Piece | None = None
-
-
-class GameStateType(StrEnum):
-    PICK_PIECE = ("PICK_PIECE")
-    PLACE_PIECE = ("PLACE_PIECE")
-
-    def __init__(self, type):
-        self.type = type
-
-
-class AbstractGameState(ABC):
-    _instance = None
-
-    # Singleton
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
-
-    @abstractmethod
-    def on_key(self, ks, mgr) -> tuple[Self | None, bool]:
-        pass
-
-    @abstractmethod
-    def gs_type(self) -> GameStateType:
-        pass
-
-    def on_key_shared(self, ks: Keystroke, mgr, next_state, actions_taken) -> tuple[Self | None, bool]:
-
-        if ks == 'w' or ks == 'W':
-            mgr.view_offset = (
-                mgr.view_offset[0] - 1,
-                mgr.view_offset[1]
-            )
-            actions_taken = True
-
-        if ks == 's' or ks == 'W':
-            mgr.view_offset = (
-                mgr.view_offset[0] + 1,
-                mgr.view_offset[1]
-            )
-            actions_taken = True
-
-        if ks == 'a' or ks == 'A':
-            mgr.view_offset = (
-                mgr.view_offset[0],
-                mgr.view_offset[1] - 1,
-            )
-            actions_taken = True
-
-        if ks == 'd' or ks == 'D':
-            mgr.view_offset = (
-                mgr.view_offset[0],
-                mgr.view_offset[1] + 1,
-            )
-            actions_taken = True
-
-        return (next_state, actions_taken)
+    # selected_piece: Piece | None = None
 
 # TODO put all these handler classes in their own file
-
-
-class PlacePieceGameState(AbstractGameState):
-
-    def gs_type(self):
-        return GameStateType.PICK_PIECE
-
-    def __init__(self, term, board):
-        self.term = term
-        self.board = board
-
-    def on_key(self, ks, mgr) -> tuple[AbstractGameState | None, bool]:
-        actions_taken = False
-        next_state = PlacePieceGameState(self.term, self.board)
-
-        if (ks.code in [self.term.KEY_LEFT, self.term.KEY_RIGHT]):
-
-            # 
-            
-
-            current_piece_type = mgr.player_display_state_map[self.board.curr_player].piece_bank_mgr.current_piece
-            #destinations = self.board.get_destinations( piece = Piece(Position(0, 0, 0), current_piece_type, self.board.get_curr_player())
-            start_pos = mgr.selector._pos if mgr.selector else None
-
-            start_positions = self.board.get_destinations(current_piece_type, start_pos)
-            logging.debug(f"{start_positions}")
-
-            assert len(start_positions) > 0
-
-            last_pos = (mgr.selector and mgr.selector._pos) or None
-            if (last_pos in start_positions):
-                last_pos_idx = start_positions.index(last_pos)
-                if (ks.code == self.term.KEY_LEFT):
-                    pos_idx = (last_pos_idx - 1) % len(start_positions)
-                elif (ks.code == self.term.KEY_RIGHT):
-                    pos_idx = (last_pos_idx + 1) % len(start_positions)
-                else:
-                    raise ValueError("Invalid arrow key")
-            else:
-                pos_idx=0
-            pos = start_positions[pos_idx]
-
-            piece = Piece(pos, current_piece_type, self.board.curr_player)
-
-            # if use_virtual_move:
-                # TODO fail if not valid move
-            # self.board.virtual_move(piece, pos)
-            mgr.selector = SelectorCell(
-                style=TemplateStyle.Selected,
-                pos=pos,
-                board=self.board,
-                term=self.term,
-            )
-            # else:
-            actions_taken = True
-        elif (ks.code == self.term.ENTER or ks.code == self.term.KEY_ENTER):
-            next_state = PickPieceGameState(self.term, self.board)
-            current_piece_type = mgr.player_display_state_map[self.board.curr_player].piece_bank_mgr.current_piece
-            last_pos = (mgr.selector and mgr.selector._pos) or None
-            if last_pos is None:
-                raise Exception("Invalid state. last_pos should be set")
-            piece = Piece(last_pos, current_piece_type, self.board.get_current_player())
-            self.board.move(piece, last_pos, self.board.get_curr_player())
-            actions_taken = True
-
-
-        return super().on_key_shared(ks, mgr, next_state, actions_taken)
-
-
-class PickPieceGameState(AbstractGameState):
-
-    def gs_type(self):
-        return GameStateType.PICK_PIECE
-
-    def __init__(self, term: Terminal, board: Board):
-        self.term = term
-        self.board = board
-
-    def on_key(self, ks, mgr) -> tuple[AbstractGameState | None, bool]:
-        next_state = None
-        actions_taken = False
-        if (ks.code == self.term.KEY_LEFT):
-            # logging.debug('in branch')
-            mgr.player_display_state_map[self.board.curr_player].piece_bank_mgr.select_prev_piece(
-            )
-            actions_taken = True
-
-        elif (ks.code == self.term.KEY_RIGHT):
-            mgr.player_display_state_map[self.board.curr_player].piece_bank_mgr.select_next_piece(
-            )
-            actions_taken = True
-
-        elif (ks.code == self.term.ENTER or ks.code == self.term.KEY_ENTER):
-
-            if (self.board.step > 0):
-                next_state = PlacePieceGameState(self.term, self.board)
-
-            current_piece_type = mgr.player_display_state_map[
-                self.board.curr_player].piece_bank_mgr.current_piece
-            # TODO  these should come from the board's suggestion as the next available position
-            piece = Piece(Position(0, 0, 0),
-                          current_piece_type, self.board.get_curr_player())
-            start_positions = self.board.get_destinations(piece.type, None)
-            logging.debug(f"{start_positions}")
-
-            if self.board.step > 0:
-                # TODO fail if not valid move
-                # self.board.virtual_move(piece, start_positions[0])
-                mgr.selector = SelectorCell(
-                    style=TemplateStyle.Selected,
-                    pos=start_positions[0],
-                    board=self.board,
-                    term=self.term,
-                )
-            else:
-                self.board.move(
-                    piece, start_positions[0], self.board.get_curr_player())
-            actions_taken = True
-
-        return super().on_key_shared(ks, mgr, next_state, actions_taken)
 
 
 class ScreenManager:
@@ -231,12 +55,11 @@ class ScreenManager:
         # RESUME - make a demo that displays screen grid w/ arc coordinates or xy coordinates
         # will help with doing algorithms on arc coordinates
         self.dirty = True
-        self.state: AbstractGameState = PickPieceGameState(term, board)
+        self.state: AbstractState = PickPieceTypeState(term, board)
         self.selected_type: None | PieceType = None
 
         self.view_offset: tuple[int, int] = (0, 0)
 
-        # logging.debug(self.board.map.occupied_positions())
         if len(self.board.map.occupied_positions()) > 0:
 
             min_x = math.inf
@@ -278,14 +101,13 @@ class ScreenManager:
 
     # TODO hwo to do javadocs for methods, cclasses, etc
     # returns whether any action was taken that might need a redraw
-    def onkey(self, key: Keystroke):
+    def on_key(self, key: Keystroke):
         actions_taken = False
-        # logging.debug(self.state)
         next_state, actions_taken = self.state.on_key(key, self)
         if (next_state):
             self.state = next_state
 
-        return actions_taken
+        return (next_state, actions_taken)
     # TODO if needed
     # def on_resize
 
@@ -309,7 +131,6 @@ class ScreenManager:
     #     ]
 
     def draw_piece_banks(self) -> None:
-        # logging.debug("drawing piece banks")
         # str_piece_bank = self.piece_bank_mgr1.draw(Player.Player1, PieceType
         self.player_display_state_map[Player.Player1].piece_bank_mgr.draw(
             self.display_buff)
@@ -317,24 +138,20 @@ class ScreenManager:
             self.display_buff)
 
     def draw_pieces(self) -> None:
-        # logging.debug("drawing pieces")
         self.draw_cells(self.cells)
 
     def draw_selector(self) -> None:
         if self.selector:
-            # logging.debug("drawing selector")
             self.draw_cells([self.selector])
 
     # TODO Make more typing mandatory -> Stuff
     def draw_cells(self, screen_cells) -> None:
         """Draws pieces and selector"""
 
-        # logging.debug(f"mgr viewport_offset:{self.get_viewport_offset()}")
 
         for screen_cell in reversed(screen_cells):
             if self.slow_display:
                 time.sleep(0.2)
-            # logging.debug(f"viewport_offset:${self.get_viewport_offset()}")
             screen_cell.draw(term=self.term,
                              buffer=self.display_buff,
                              player=Player.Player1,  # TODO update when turns implemented
@@ -345,8 +162,6 @@ class ScreenManager:
     # TODO right now this functions as the viewport but at some point will want to make the viewport moveable
     def get_viewport_offset(self) -> tuple[int, int]:
         screen_center = self.get_screen_center()
-        # logging.debug(f"screen center: ${screen_center}")
-        # logging.debug(f"view offset: ${self.view_offset}")
 
         return (
             screen_center[0] + self.view_offset[0],
@@ -355,7 +170,6 @@ class ScreenManager:
 
     # TODO change this to offset within player areas
     def get_screen_center(self) -> tuple[int, int]:
-        # logging.debug(f"height:${self.term.height}, width:${self.term.width}")
         return ((self.term.height) // 2, (self.term.width) // 2)
 
     def init_selector(self) -> None:
@@ -376,6 +190,10 @@ class ScreenManager:
         piece_bank_mgr = display_state.piece_bank_mgr
         piece_bank_mgr.move(key)
 
+    def get_piece_bank_selected(self) -> tuple[Player, PieceType]:
+        display_state: PlayerDisplayState = self.player_display_state_map[self.board.curr_player]
+        return (self.board.curr_player, display_state.piece_bank_mgr.current_piece)
+
     def clear_display_buff(self):
         self.display_buff = self.build_display_buff()
 
@@ -391,7 +209,6 @@ class ScreenManager:
         return buffer
 
     def flush_buffer(self):
-        # logging.debug("flushing buffer")
         out: str = self.term.clear + self.term.home
         c: str | None = None
         for y_idx, line in enumerate(self.display_buff):
@@ -400,7 +217,6 @@ class ScreenManager:
                     # TODO there's probably a better way to do this by concatenating the c's in
                     # one line first...
                     # print(c + "d")
-                    # logging.debug(f"plotting {c} at {x_idx},{y_idx})")
                     out += self.term.move_xy(x_idx, y_idx) + c  # '█'
         print(out, end="", flush=True)
 
