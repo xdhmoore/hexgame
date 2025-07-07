@@ -35,6 +35,7 @@ from hex.position import Position
 @dataclass
 class PlayerDisplayState:
     piece_bank_mgr: PieceBankManager
+    selected_piece: Piece | None = None
 
 
 class GameStateType(StrEnum):
@@ -107,23 +108,59 @@ class PlacePieceGameState(AbstractGameState):
         self.board = board
 
     def on_key(self, ks, mgr) -> tuple[AbstractGameState | None, bool]:
-        next_state = None
         actions_taken = False
-        if mgr.selector == None:
-            # TODO words in errors
-            #raise RuntimeError()
-            pass
-        elif mgr.selector.piece == None:
-            # TODO when you're placing but the selector isn't over a real place
+        next_state = PlacePieceGameState(self.term, self.board)
 
-            raise RuntimeError()
-        else:
-            if (ks.code == self.term.ENTER or ks.code == self.term.KEY_ENTER):
-                self.board.clear_virtual_pieces()
-                self.board.move(mgr.selector.piece,
-                                pos=mgr.selector._pos)
-                next_state = PickPieceGameState(self.term, self.board)
+        if (ks.code in [self.term.KEY_LEFT, self.term.KEY_RIGHT]):
+
+            # 
+            
+
+            current_piece_type = mgr.player_display_state_map[self.board.curr_player].piece_bank_mgr.current_piece
+            #destinations = self.board.get_destinations( piece = Piece(Position(0, 0, 0), current_piece_type, self.board.get_curr_player())
+            start_pos = mgr.selector._pos if mgr.selector else None
+
+            start_positions = self.board.get_destinations(current_piece_type, start_pos)
+            logging.debug(f"{start_positions}")
+
+            assert len(start_positions) > 0
+
+            last_pos = (mgr.selector and mgr.selector._pos) or None
+            if (last_pos in start_positions):
+                last_pos_idx = start_positions.index(last_pos)
+                if (ks.code == self.term.KEY_LEFT):
+                    pos_idx = (last_pos_idx - 1) % len(start_positions)
+                elif (ks.code == self.term.KEY_RIGHT):
+                    pos_idx = (last_pos_idx + 1) % len(start_positions)
+                else:
+                    raise ValueError("Invalid arrow key")
+            else:
+                pos_idx=0
+            pos = start_positions[pos_idx]
+
+            piece = Piece(pos, current_piece_type, self.board.curr_player)
+
+            # if use_virtual_move:
+                # TODO fail if not valid move
+            # self.board.virtual_move(piece, pos)
+            mgr.selector = SelectorCell(
+                style=TemplateStyle.Selected,
+                pos=pos,
+                board=self.board,
+                term=self.term,
+            )
+            # else:
             actions_taken = True
+        elif (ks.code == self.term.ENTER or ks.code == self.term.KEY_ENTER):
+            next_state = PickPieceGameState(self.term, self.board)
+            current_piece_type = mgr.player_display_state_map[self.board.curr_player].piece_bank_mgr.current_piece
+            last_pos = (mgr.selector and mgr.selector._pos) or None
+            if last_pos is None:
+                raise Exception("Invalid state. last_pos should be set")
+            piece = Piece(last_pos, current_piece_type, self.board.get_current_player())
+            self.board.move(piece, last_pos, self.board.get_curr_player())
+            actions_taken = True
+
 
         return super().on_key_shared(ks, mgr, next_state, actions_taken)
 
@@ -161,11 +198,12 @@ class PickPieceGameState(AbstractGameState):
             # TODO  these should come from the board's suggestion as the next available position
             piece = Piece(Position(0, 0, 0),
                           current_piece_type, self.board.get_curr_player())
-            start_positions, use_virtual_move = self.board.get_destinations(piece.type, None)
+            start_positions = self.board.get_destinations(piece.type, None)
+            logging.debug(f"{start_positions}")
 
-            if use_virtual_move:
+            if self.board.step > 0:
                 # TODO fail if not valid move
-                self.board.virtual_move(piece, start_positions[0])
+                # self.board.virtual_move(piece, start_positions[0])
                 mgr.selector = SelectorCell(
                     style=TemplateStyle.Selected,
                     pos=start_positions[0],
@@ -173,7 +211,8 @@ class PickPieceGameState(AbstractGameState):
                     term=self.term,
                 )
             else:
-                self.board.move(piece, start_positions[0], self.board.get_curr_player())
+                self.board.move(
+                    piece, start_positions[0], self.board.get_curr_player())
             actions_taken = True
 
         return super().on_key_shared(ks, mgr, next_state, actions_taken)
@@ -235,7 +274,7 @@ class ScreenManager:
 
     @property
     def cells(self):
-        return [ScreenCell(self.term, (TemplateStyle.Debug if self.debug else TemplateStyle.Plain),  node.piece)  for node in self.board.map.mapmap.values()]
+        return [ScreenCell(self.term, (TemplateStyle.Debug if self.debug else TemplateStyle.Plain),  node.piece) for node in self.board.map.mapmap.values()]
 
     # TODO hwo to do javadocs for methods, cclasses, etc
     # returns whether any action was taken that might need a redraw

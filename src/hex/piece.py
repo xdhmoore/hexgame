@@ -24,7 +24,7 @@ class Piece:
     # this is 
     def _move(self, map: Map, dest: Position, player: Player) -> bool:
         # TODO handle beetles moving over other tiles
-        if (map.get(*dest.axy)):
+        if (map.get(dest)):
             return False
         
         map.place(self, dest, player)

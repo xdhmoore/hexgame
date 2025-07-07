@@ -1,6 +1,9 @@
 
 from dataclasses import dataclass
+import logging
 from typing import Any
+
+from sortedcontainers import SortedDict
 from hex.player import Player
 from hex.position import Position
 
@@ -8,15 +11,14 @@ from hex.position import Position
 class Map:
 
     def __init__(self):
-        self.mapmap: dict[tuple[int, int, int], MapNode] = dict()
+        self.mapmap = SortedDict()
 
-    # RESUME
-    def get(self, a, x, y) -> "MapNode | None":
-        return self.mapmap.get((a, x, y))
+    def get(self, pos: Position) -> "MapNode | None":
+        return self.mapmap.get(pos)
     
     def get_piece(self, a, x, y): #-> Piece | None:
         # TODO more succinct verison of this
-        node = self.get(a, x, y)
+        node = self.get(Position(a, x, y))
         if (node is None):
             return None
         else:
@@ -24,22 +26,25 @@ class Map:
     
     def place(self, piece, pos:Position, player: Player):
         piece.pos = pos
-        self.mapmap[piece.pos.axy] = MapNode(self, piece);
+        self.mapmap[piece.pos] = MapNode(self, piece);
     
     def occupied_positions(self) -> list[Position]:
-        return [Position(a, x, y) for a, x, y in self.mapmap.keys()]
+        return [pos for pos in self.mapmap.keys()]
 
     def get_playable_edges(self):
-        edges = [
-            Position(a, x, y)
-            for (a, x, y), node in self.mapmap.items()
-            if node is not None
+        occupied = [
+            pos for pos, node in self.mapmap.items()
         ]
+        edges = []
+        for o in occupied:
+            edges += o.get_adjacent_positions()
+
         # TODO filter out
+        logging.debug(f"{edges}")
         return edges
     
     def occupied(self, pos:Position):
-        return self.mapmap.get(pos.axy) is not None
+        return self.mapmap.get(pos) is not None
 
 @dataclass
 class MapNode:

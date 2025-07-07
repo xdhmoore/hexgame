@@ -73,7 +73,7 @@ class CliGame:
 
     # System Seq Diagram : [MermaidChart: 1d3677c8-35c2-4a64-9971-d59d7e11e9bd]
     # Seq Diagram: [MermaidChart: 0cc01e70-aa53-4810-889d-46c95a7dcfb3]
-    def main(self, grid) -> None:
+    def main(self, args) -> None:
 
         try:
 
@@ -82,11 +82,11 @@ class CliGame:
                 print(term.home + term.clear)
                 board = Board()
 
-                if (grid):
+                if (args.grid):
                     generate_place_pieces(board)
 
                 mgr = ScreenManager(
-                    board, term, debug=True, slow_display=False)
+                    board, term, debug=True, slow_display=args.slow)
 
 
                 val = term.inkey(0.1)
@@ -118,8 +118,9 @@ def process_keystrokes(term: Terminal, mgr: ScreenManager, ks) -> bool:
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Hex Game")
-    parser.add_argument("--grid", action="store_true", help="Greeting to use")
+    parser.add_argument("--grid", action="store_true", help="Generate a grid of pieces")
+    parser.add_argument("--slow", action="store_true", help="Slow down the display for debugging purposes")
 
     args = parser.parse_args()
 
-    CliGame().main(args.grid)
+    CliGame().main(args)

@@ -32,8 +32,8 @@ class Board:
     def __init__(self) -> None:
         # TODO might be interesting to implement this with a small graph db like cogdb
         # TODO - make this a map from hex location to piece
-        #self.pieces = SortedDict()
-        self.virtual_pieces = dict()
+        #self.pieces = SortedDict() 
+        # self.virtual_pieces = dict()
         # self.placements = dict()
         self.edgeHead = None
         self.edgeTail = None
@@ -68,17 +68,17 @@ class Board:
         #     if len(piece.get_adjacent_pieces()) < 5
         # ]
 
-    def get_destinations(self, piece_type: PieceType, start_pos: Position | None) -> tuple[list[Position], bool]:
+    def get_destinations(self, piece_type: PieceType, start_pos: Position | None) -> list[Position]:
         # https://www.boardspace.net/english/about_hive_notation.html
         # Do a depth-first-search for the wall from each of the adjacent tiles
         if (self.step == 0):
-            return ([Position(0, 0, 0)], False)
+            return [Position(0, 0, 0)]
 
         player = self.get_curr_player()
 
 
         if (start_pos is None):
-            return (self.map.get_playable_edges(), True)
+            return self.map.get_playable_edges()
 
         # TODO
         # assert (player, piece_type) == self.at(start_pos)
@@ -86,7 +86,7 @@ class Board:
         # RESUME - do this by first setting up the map
         # return piece_type.get_destinations(self.board, player, piece_type, start_pos)
         # TODO remove
-        return ([Position(0, 0, 0),], False)
+        return [Position(0, 0, 0),]
 
 
     def filter_blocked_piees(self, pieces) -> list[Piece]:
@@ -145,20 +145,21 @@ class Board:
     #     # TODO take advantage of pieces sorteddict ordering to get max/min of at least y coord
     #     return reduce(lambda a, b: min(a.pos.r, b.pos.r), self.pieces)
 
-    def clear_virtual_pieces(self) -> None:
-        self.virtual_pieces = dict()
+    # def clear_virtual_pieces(self) -> None:
+    #     self.virtual_pieces = dict()
 
 # TODO rename to preview_move
-    def virtual_move(self, piece: Piece, pos: Position) -> bool:
-        # self.pieces_by_pos[piece.pos] = None
-        # if not piece._move(self.map, pos):
-        if self.map.occupied(pos):
-            return False
+    # def virtual_move(self, piece: Piece, pos: Position) -> bool:
+    #     # self.pieces_by_pos[piece.pos] = None
+    #     # if not piece._move(self.map, pos):
+    #     if self.map.occupied(pos):
+    #         return False
 
-        self.virtual_pieces[id(piece)] = piece
-        # TODO map to id instead to save space?
-        # //self.placements[piece.pos] = piece
-        return True
+    #     # TODO should this also be keyed based off of position?
+    #     self.virtual_pieces[id(piece)] = piece
+    #     # TODO map to id instead to save space?
+    #     # //self.placements[piece.pos] = piece
+    #     return True
 
     # TODO change callers to handle when this returns false
     def move(self, piece: Piece, pos: Position, player) -> bool:

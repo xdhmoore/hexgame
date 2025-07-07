@@ -1,0 +1,25 @@
+@startuml
+
+/'
+wasd
+lr 
+Enter
+'/
+
+[*] --> PickPiece
+PickPiece --> PickPiece : wasd
+PickPiece --> PickPiece : lr
+PickPiece --> PlacePiece : Enter
+
+
+PlacePiece --> PlacePiece : wasd
+PlacePiece --> PlacePiece : lr
+PlacePiece --> PickPiece : Enter
+
+/'
+;State1 --> [*]
+State1 : this is a string
+State1 : this is another string
+State1 -> State2
+State2 --> [*]
+'/

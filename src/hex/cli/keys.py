@@ -12,7 +12,8 @@ class Keys:
 
     @classmethod
     def arrows(cls, term: Terminal) -> list[str]:
-        return [term.KEY_LEFT, term.KEY_UP, term.KEY_DOWN, term.KEY_RIGHT, term.l, term.j, term.h, term.k]
+        # return [term.KEY_LEFT, term.KEY_UP, term.KEY_DOWN, term.KEY_RIGHT, term.l, term.j, term.h, term.k]
+        return [term.KEY_LEFT, term.KEY_UP, term.KEY_DOWN, term.KEY_RIGHT]
 
 
 # From https://blessed.readthedocs.io/en/stable/keyboard.html

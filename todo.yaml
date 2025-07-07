@@ -10,6 +10,9 @@ todos:
           - [ ] read up on reactive rxpy
           - [ ] reimplement a stateful keyhandler:
             url: https://rxpy.readthedocs.io/en/latest/index.html
+        - [ ] implement blinking as a style
+        - [ ] implement greyed out as a style
+        - [ ] make tiles save in order using SortedDict again - needed for styles
     -[ ] make more colorful based on pieces and layers
     -[ ] make piece bank menus display full names?
     -[ ] add limits to how far you can move the board

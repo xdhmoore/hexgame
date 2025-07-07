@@ -19,10 +19,12 @@
     "vscode": {
       "extensions": [
         "ms-azuretools.vscode-docker",
-        "MermaidChart.vscode-mermaid-chart",
+        // the docs on this have partly disappeared. opting for plantuml instead
+        // "MermaidChart.vscode-mermaid-chart",
         "Gruntfuggly.todo-tree",
         "ms-python.isort",
-        "ms-python.black-formatter"
+        "ms-python.black-formatter",
+        "jebbs.plantuml"
       ]
     }
   },
